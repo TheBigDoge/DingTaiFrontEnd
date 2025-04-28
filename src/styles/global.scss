@@ -1,0 +1,81 @@
+@forward 'variables';
+@use 'variables' as *;
+
+/* 全局样式 */
+page {
+	background-color: $uni-bg-color-grey;
+	font-size: $uni-font-size-sm;
+	color: $uni-text-color;
+	box-sizing: border-box;
+	min-height: 100vh;
+}
+
+/* 通用样式类 */
+.container {
+	padding: $uni-spacing-sm;
+}
+
+.flex-row {
+	display: flex;
+	flex-direction: row;
+}
+
+.flex-column {
+	display: flex;
+	flex-direction: column;
+}
+
+.flex-center {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.text-ellipsis {
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.text-ellipsis-2 {
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2;
+	overflow: hidden;
+}
+
+.safe-area-bottom {
+	padding-bottom: env(safe-area-inset-bottom);
+}
+
+.card {
+	background-color: #fff;
+	border-radius: $uni-border-radius-md;
+	box-shadow: $uni-box-shadow;
+	margin-bottom: $uni-spacing-sm;
+	overflow: hidden;
+}
+
+.price {
+	color: $uni-price-color;
+	font-weight: bold;
+	font-size: $uni-font-size-md;
+}
+
+.member-price {
+	color: $uni-price-color;
+	font-size: $uni-font-size-sm;
+
+	&::before {
+		content: '会员价：';
+		color: $uni-text-color-light;
+		font-size: $uni-font-size-xs;
+	}
+}
+
+.original-price {
+	color: $uni-text-color-light;
+	font-size: $uni-font-size-xs;
+	text-decoration: line-through;
+	margin-left: $uni-spacing-xs;
+}

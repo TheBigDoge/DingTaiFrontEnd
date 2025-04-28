@@ -1,0 +1,80 @@
+/* ---------- 自定义主题颜色变量 ---------- */
+/* 品牌主色 */
+$uni-color-primary: #333333;
+$uni-color-primary-light: #666666;
+
+/* 行为相关颜色 */
+$uni-color-success: #4cd964;
+$uni-color-warning: #f0ad4e;
+$uni-color-error: #dd524d;
+
+/* 文字颜色 */
+$uni-text-color: #333333;
+$uni-text-color-secondary: #666666;
+$uni-text-color-light: #999999;
+$uni-text-color-inverse: #fff; // 反色
+$uni-text-color-placeholder: #808080;
+$uni-text-color-disable: #c0c0c0;
+
+/* 背景色 */
+$uni-bg-color: #ffffff;
+$uni-bg-color-grey: #F5F5F0;
+$uni-bg-color-light: #F8F8F8;
+$uni-bg-color-hover: #f1f1f1; // 点击状态颜色
+$uni-bg-color-mask: rgba(0, 0, 0, 0.4); // 遮罩颜色
+
+/* 边框颜色 */
+$uni-border-color: #EEEEEE;
+
+/* 价格颜色 */
+$uni-price-color: #FF6B35;
+
+/* ---------- 尺寸变量 ---------- */
+/* 间距 */
+$uni-spacing-xs: 10rpx;
+$uni-spacing-sm: 20rpx;
+$uni-spacing-md: 30rpx;
+$uni-spacing-lg: 40rpx;
+
+/* 水平间距 */
+$uni-spacing-row-sm: 5px;
+$uni-spacing-row-base: 10px;
+$uni-spacing-row-lg: 15px;
+
+/* 垂直间距 */
+$uni-spacing-col-sm: 4px;
+$uni-spacing-col-base: 8px;
+$uni-spacing-col-lg: 12px;
+
+/* 字体大小 */
+$uni-font-size-xs: 24rpx;
+$uni-font-size-sm: 28rpx;
+$uni-font-size-md: 32rpx;
+$uni-font-size-lg: 36rpx;
+$uni-font-size-base: 14px;
+$uni-font-size-title: 20px;
+$uni-font-size-subtitle: 18px;
+$uni-font-size-paragraph: 15px;
+
+/* 图片尺寸 */
+$uni-img-size-sm: 20px;
+$uni-img-size-base: 26px;
+$uni-img-size-lg: 40px;
+
+/* 圆角 */
+$uni-border-radius-sm: 8rpx;
+$uni-border-radius-md: 12rpx;
+$uni-border-radius-lg: 24rpx;
+$uni-border-radius-circle: 50%;
+
+/* 阴影 */
+$uni-box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+$uni-box-shadow-lg: 0 4rpx 16rpx rgba(0, 0, 0, 0.08);
+
+/* 透明度 */
+$uni-opacity-disabled: 0.3; // 组件禁用态的透明度
+
+/* 文章场景相关 */
+$uni-color-title: #2c405a; // 文章标题颜色
+$uni-color-subtitle: #555; // 二级标题颜色
+$uni-color-paragraph: #3f536e; // 文章段落颜色 
