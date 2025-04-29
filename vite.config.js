@@ -6,20 +6,6 @@ export default defineConfig({
   plugins: [
     uni(),
   ],
-  base: './', // Set base path for assets
-  build: {
-    outDir: 'dist/build/h5',
-    assetsDir: 'assets',
-    minify: 'terser',
-    sourcemap: false,
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          'vendor': ['vue', 'vue-i18n'],
-        }
-      }
-    }
-  },
   css: {
     preprocessorOptions: {
       scss: {
@@ -32,12 +18,4 @@ export default defineConfig({
       },
     },
   },
-  // server: {
-  //   port: 3000,
-  //   host: true
-  // },
-  server: {
-    host: "localhost",
-    port: 3000,
-  }
 })
