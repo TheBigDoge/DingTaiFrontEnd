@@ -31,7 +31,8 @@
     "build:mp-xhs": "uni build -p mp-xhs",
     "build:quickapp-webview": "uni build -p quickapp-webview",
     "build:quickapp-webview-huawei": "uni build -p quickapp-webview-huawei",
-    "build:quickapp-webview-union": "uni build -p quickapp-webview-union"
+    "build:quickapp-webview-union": "uni build -p quickapp-webview-union",
+    "serve:h5": "http-server dist/build/h5 -p 30099 -a 0.0.0.0"
   },
   "dependencies": {
     "@dcloudio/uni-app": "3.0.0-4050620250312001",
@@ -59,6 +60,7 @@
     "@dcloudio/uni-stacktracey": "3.0.0-4050620250312001",
     "@dcloudio/vite-plugin-uni": "3.0.0-4050620250312001",
     "@vue/runtime-core": "3.5.13",
+    "http-server": "^14.1.1",
     "sass": "^1.86.0",
     "sass-loader": "^16.0.5",
     "vite": "5.2.8"

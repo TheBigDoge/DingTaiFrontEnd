@@ -101,7 +101,7 @@
             id: 3,
             name: '裤装面料',
             icon: '/static/images/icons/pants-fabric.png',
-            categoryId: 7  // 对应休闲裤
+            categoryId: 1  // 对应套装/裤子
           },
           {
             id: 4,
@@ -161,6 +161,16 @@
     methods: {
       handleSearch(keyword) {
         this.searchKeyword = keyword;
+        // Navigate to category page with search tag
+        uni.switchTab({
+          url: `/pages/category/category?search=${encodeURIComponent(keyword)}`,
+          success: () => {
+            console.log('Successfully navigated to category page with search tag')
+          },
+          fail: (err) => {
+            console.error('Navigation failed:', err)
+          }
+        })
       },
       handleCategoryClick(category) {
         console.log('Navigating to category:', category.name, 'with ID:', category.categoryId)

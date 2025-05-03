@@ -88,25 +88,42 @@
 					
 					// 确保分类菜单滚动到选中项
 					this.$nextTick(() => {
-						const query = uni.createSelectorQuery().in(this)
-						query.select('.category-menu').boundingClientRect()
-						query.select(`.menu-item:nth-child(${categoryIndex + 1})`).boundingClientRect()
-						query.exec((res) => {
-							if (res[0] && res[1]) {
-								const menu = res[0]
-								const menuItem = res[1]
-								const scrollTop = menuItem.top - menu.top
-								console.log('Scrolling to position:', scrollTop)
-								this.scrollTop = scrollTop
-							}
-						})
+						this.scrollToCategory(categoryIndex)
 					})
 				}
+			}
+
+			// 处理搜索标签
+			if (options.search) {
+				this.keyword = decodeURIComponent(options.search)
+				// 设置搜索标签为活动状态
+				this.activeTabIndex = 0 // 设置为综合标签
+				// 重置分类为全部
+				this.activeCategoryIndex = 0
+				// 确保滚动到顶部
+				this.$nextTick(() => {
+					this.scrollToCategory(0)
+				})
 			}
 
 			this.loadProducts()
 		},
 		methods: {
+			scrollToCategory(index) {
+				const query = uni.createSelectorQuery().in(this)
+				query.select('.category-menu').boundingClientRect()
+				query.select(`.menu-item:nth-child(${index + 1})`).boundingClientRect()
+				query.exec((res) => {
+					if (res[0] && res[1]) {
+						const menu = res[0]
+						const menuItem = res[1]
+						// 计算滚动位置，确保选中项在可视区域中间
+						const scrollTop = menuItem.top - menu.top - (menu.height - menuItem.height) / 2
+						console.log('Scrolling to position:', scrollTop)
+						this.scrollTop = scrollTop
+					}
+				})
+			},
 			handleSearch(keyword) {
 				this.keyword = keyword
 				this.page = 1

@@ -26,10 +26,15 @@
 					</view>
 					<view class="item-details">
 						<view class="item-size">规格：{{ item.length }}米</view>
-						<view class="quantity-control">
-							<text class="quantity-btn" @click="updateQuantity(index, -0.1)">-</text>
+						<view class="quantity-control" :class="{ disabled: item.isWholePiece }">
+							<text class="quantity-btn" @click="updateQuantity(index, -0.1)" :class="{ disabled: item.isWholePiece }">-</text>
 							<text class="quantity">{{ item.length }}</text>
-							<text class="quantity-btn" @click="updateQuantity(index, 0.1)">+</text>
+							<text class="quantity-btn" @click="updateQuantity(index, 0.1)" :class="{ disabled: item.isWholePiece }">+</text>
+						</view>
+						<view class="buy-whole-container">
+							<view class="buy-whole-btn" :class="{ active: item.isWholePiece }" @click="toggleWholePiece(index)">
+								<text class="btn-text">整块购买</text>
+							</view>
 						</view>
 					</view>
 				</view>
@@ -191,9 +196,19 @@
 			},
 			updateQuantity(index, change) {
 				const item = this.orderItems[index];
+				if (item.isWholePiece) return; // If whole piece mode is on, don't allow quantity changes
 				const newLength = parseFloat((item.length + change).toFixed(1));
 				if (newLength >= 0.5) {
 					item.length = newLength;
+				}
+			},
+			toggleWholePiece(index) {
+				const item = this.orderItems[index];
+				item.isWholePiece = !item.isWholePiece;
+				if (item.isWholePiece) {
+					item.length = 10.0; // Set to maximum length when whole piece is selected
+				} else {
+					item.length = 2.0; // Reset to default length when whole piece is deselected
 				}
 			},
 			selectDelivery(method) {
@@ -425,23 +440,59 @@
 					.quantity-control {
 						display: flex;
 						align-items: center;
-						gap: 20rpx;
+						margin-left: 20rpx;
+
+						&.disabled {
+							opacity: 0.5;
+							pointer-events: none;
+						}
 
 						.quantity-btn {
-							width: 60rpx;
-							height: 60rpx;
-							border: 2rpx solid #ddd;
-							border-radius: 50%;
-							display: flex;
-							align-items: center;
-							justify-content: center;
-							font-size: 36rpx;
+							width: 50rpx;
+							height: 50rpx;
+							line-height: 50rpx;
+							text-align: center;
+							background-color: #f5f5f5;
+							border-radius: 25rpx;
+
+							&.disabled {
+								opacity: 0.5;
+								pointer-events: none;
+							}
 						}
 
 						.quantity {
-							font-size: 28rpx;
+							margin: 0 20rpx;
 							min-width: 60rpx;
 							text-align: center;
+						}
+					}
+
+					.buy-whole-container {
+						display: flex;
+						align-items: center;
+						margin-left: 20rpx;
+
+						.buy-whole-btn {
+							padding: 8rpx 20rpx;
+							border: 2rpx solid #ddd;
+							border-radius: 30rpx;
+							font-size: 28rpx;
+							transition: all 0.3s ease;
+
+							&.active {
+								background-color: #ff4d4f;
+								border-color: #ff4d4f;
+								color: #fff;
+							}
+
+							&:active {
+								opacity: 0.8;
+							}
+
+							.btn-text {
+								font-size: 24rpx;
+							}
 						}
 					}
 				}

@@ -21,7 +21,10 @@
 						<view class="item-name text-ellipsis-2">{{ item.name }}</view>
 						<view class="item-spec" v-if="item.color">颜色：{{ item.color }}</view>
 						<view class="item-bottom">
-							<view class="item-price">¥{{ item.unitPrice }}/m</view>
+							<view class="item-price">
+								<text class="member-price">¥{{ (item.unitPrice * 0.9).toFixed(2) }}/m</text>
+								<text class="original-price">¥{{ item.unitPrice }}/m</text>
+							</view>
 							<view class="item-count">
 								<text class="count-btn" @click="decreaseLength(index)">-</text>
 								<text class="count-num">{{ item.length }}</text>
@@ -60,6 +63,7 @@
 								<text class="price">¥{{ totalPrice }}</text>
 							</view>
 							<view class="discount-info" v-if="discount > 0">已优惠：¥{{ discount }}</view>
+							<view class="member-discount-info">会员享受9折优惠</view>
 						</view>
 						<view class="checkout-btn" @click="handleCheckout">
 							结算({{ selectedCount }}件)
@@ -112,7 +116,7 @@
 				return this.cartList
 					.filter(item => item.selected)
 					.reduce((total, item) => {
-						const itemTotal = item.unitPrice * item.length;
+						const itemTotal = item.unitPrice * item.length * 0.9; // Apply member discount
 						return total + itemTotal;
 					}, 0).toFixed(2)
 			},
@@ -372,9 +376,22 @@
 					align-items: center;
 
 					.item-price {
-						color: $uni-price-color;
-						font-size: $uni-font-size-md;
-						font-weight: bold;
+						display: flex;
+						flex-direction: column;
+						align-items: flex-start;
+						gap: 4rpx;
+
+						.member-price {
+							color: $uni-price-color;
+							font-size: $uni-font-size-md;
+							font-weight: bold;
+						}
+
+						.original-price {
+							color: $uni-text-color-light;
+							font-size: $uni-font-size-xs;
+							text-decoration: line-through;
+						}
 					}
 
 					.item-count {
@@ -578,5 +595,11 @@
 				margin-bottom: 4rpx;
 			}
 		}
+	}
+
+	.member-discount-info {
+		color: $uni-price-color;
+		font-size: $uni-font-size-xs;
+		margin-top: 4rpx;
 	}
 </style>
