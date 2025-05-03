@@ -53,6 +53,36 @@
           @click="handleProductClick(item)"></product-card>
       </view>
     </view>
+
+    <!-- 会员专区 -->
+    <view class="membership-section">
+      <view class="section-header">
+        <text class="title">会员专区</text>
+        <text class="more">查看更多</text>
+      </view>
+      <view class="membership-content" @click="handleViewMembership">
+        <view class="membership-card" :class="{ 'active': isTouching }" @touchstart="isTouching = true" @touchend="isTouching = false">
+          <view class="membership-info">
+            <text class="membership-title">开通会员</text>
+            <text class="membership-desc">享受全场9折优惠</text>
+          </view>
+          <view class="membership-benefits">
+            <view class="benefit-item">
+              <text class="benefit-icon">✓</text>
+              <text class="benefit-text">全场商品9折</text>
+            </view>
+            <view class="benefit-item">
+              <text class="benefit-icon">✓</text>
+              <text class="benefit-text">专属客服</text>
+            </view>
+            <view class="benefit-item">
+              <text class="benefit-icon">✓</text>
+              <text class="benefit-text">优先发货</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
   </view>
 </template>
 
@@ -141,7 +171,8 @@
           }
         ],
         productList: [],
-        searchKeyword: ''
+        searchKeyword: '',
+        isTouching: false
       }
     },
     computed: {
@@ -192,6 +223,17 @@
       handleViewMore() {
         uni.switchTab({
           url: '/pages/category/category'
+        })
+      },
+      handleViewMembership() {
+        uni.switchTab({
+          url: '/pages/membership/membership',
+          success: () => {
+            console.log('Successfully navigated to membership page')
+          },
+          fail: (err) => {
+            console.error('Navigation failed:', err)
+          }
         })
       },
       onPullDownRefresh() {
@@ -297,7 +339,7 @@
 
       .more {
         font-size: $uni-font-size-sm;
-        color: $uni-text-color-light;
+        color: #999;
       }
     }
 
@@ -371,6 +413,87 @@
       padding: 100rpx 0;
       color: #999;
       font-size: 28rpx;
+    }
+  }
+
+  .membership-section {
+    margin: $uni-spacing-md;
+    background-color: #fff;
+    border-radius: $uni-border-radius-lg;
+    overflow: hidden;
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: $uni-spacing-md;
+      border-bottom: 2rpx solid $uni-border-color;
+
+      .title {
+        font-size: $uni-font-size-lg;
+        font-weight: bold;
+      }
+
+      .more {
+        font-size: $uni-font-size-sm;
+        color: #999;
+      }
+    }
+
+    .membership-content {
+      padding: $uni-spacing-md;
+      cursor: pointer;
+    }
+
+    .membership-card {
+      background: linear-gradient(135deg, #ff4d4f, #ff7875);
+      border-radius: $uni-border-radius-lg;
+      padding: $uni-spacing-lg;
+      color: #fff;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+      &.active {
+        transform: scale(0.98);
+        box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+      }
+
+      .membership-info {
+        margin-bottom: $uni-spacing-md;
+
+        .membership-title {
+          font-size: $uni-font-size-lg;
+          font-weight: bold;
+          display: block;
+          margin-bottom: $uni-spacing-xs;
+        }
+
+        .membership-desc {
+          font-size: $uni-font-size-sm;
+          opacity: 0.9;
+        }
+      }
+
+      .membership-benefits {
+        .benefit-item {
+          display: flex;
+          align-items: center;
+          margin-bottom: $uni-spacing-sm;
+
+          .benefit-icon {
+            width: 36rpx;
+            height: 36rpx;
+            line-height: 36rpx;
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            margin-right: $uni-spacing-sm;
+          }
+
+          .benefit-text {
+            font-size: $uni-font-size-sm;
+          }
+        }
+      }
     }
   }
 </style>

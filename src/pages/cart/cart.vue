@@ -78,22 +78,6 @@
 			<text class="empty-text">购物车还是空的</text>
 			<view class="go-shopping" @click="goShopping">去选购</view>
 		</view>
-
-		<!-- Add bottom navigation bar -->
-		<view class="bottom-nav safe-area-bottom">
-			<view class="nav-item" @click="goToIndex">
-				<text class="iconfont icon-home">首页</text>
-			</view>
-			<view class="nav-item" @click="goToCategory">
-				<text class="iconfont icon-category">分类</text>
-			</view>
-			<view class="nav-item active">
-				<text class="iconfont icon-cart">购物车</text>
-			</view>
-			<view class="nav-item" @click="goToUser">
-				<text class="iconfont icon-user">我的</text>
-			</view>
-		</view>
 	</view>
 </template>
 
@@ -277,21 +261,6 @@
 			saveCartList() {
 				// 保存购物车数据到本地存储
 				uni.setStorageSync('cartList', this.cartList);
-			},
-			goToIndex() {
-				uni.switchTab({
-					url: '/pages/index/index'
-				});
-			},
-			goToCategory() {
-				uni.switchTab({
-					url: '/pages/category/category'
-				});
-			},
-			goToUser() {
-				uni.switchTab({
-					url: '/pages/user/user'
-				});
 			}
 		}
 	}
@@ -465,76 +434,87 @@
 
 	.cart-footer {
 		position: fixed;
-		bottom: 100rpx;
 		left: 0;
 		right: 0;
+		bottom: 0;
 		height: 100rpx;
-		background-color: #fff;
+		background: #fff;
 		display: flex;
-		justify-content: space-between;
 		align-items: center;
-		padding: 0 $uni-spacing-md;
-		border-top: 2rpx solid $uni-border-color;
+		justify-content: space-between;
+		padding: 0 30rpx;
+		box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.05);
+		z-index: 100;
 
 		.footer-left {
 			display: flex;
 			align-items: center;
 
 			.select-all {
-				font-size: $uni-font-size-sm;
-				margin-left: $uni-spacing-xs;
+				margin-left: 10rpx;
+				font-size: 28rpx;
+				color: #333;
 			}
 		}
 
 		.footer-right {
-			flex: 1;
 			display: flex;
 			align-items: center;
-			justify-content: flex-end;
-			gap: 20rpx;
 
 			.price-section {
-				text-align: right;
 				margin-right: 20rpx;
+				text-align: right;
 
 				.total-price {
-					font-size: $uni-font-size-sm;
-					
+					font-size: 28rpx;
+					color: #333;
+
 					.price {
-						color: $uni-price-color;
 						font-size: 32rpx;
 						font-weight: bold;
+						color: #ff4d4f;
 					}
 				}
 
 				.discount-info {
-					font-size: $uni-font-size-xs;
-					color: $uni-price-color;
+					font-size: 24rpx;
+					color: #ff4d4f;
 				}
-			}
 
-			.delete-btn {
-				width: 200rpx;
-				height: 80rpx;
-				line-height: 80rpx;
-				text-align: center;
-				background-color: #ff4d4f;
-				color: #fff;
-				border-radius: 40rpx;
-				font-size: $uni-font-size-sm;
+				.member-discount-info {
+					font-size: 24rpx;
+					color: #666;
+				}
 			}
 
 			.checkout-btn {
 				width: 200rpx;
 				height: 80rpx;
 				line-height: 80rpx;
-				text-align: center;
-				background-color: $uni-price-color;
+				background: #ff4d4f;
 				color: #fff;
+				text-align: center;
 				border-radius: 40rpx;
-				font-size: $uni-font-size-sm;
+				font-size: 28rpx;
+				font-weight: bold;
+			}
+
+			.delete-btn {
+				width: 200rpx;
+				height: 80rpx;
+				line-height: 80rpx;
+				background: #ff4d4f;
+				color: #fff;
+				text-align: center;
+				border-radius: 40rpx;
+				font-size: 28rpx;
+				font-weight: bold;
 			}
 		}
+	}
+
+	.safe-area-bottom {
+		padding-bottom: env(safe-area-inset-bottom);
 	}
 
 	.empty-cart {
@@ -565,41 +545,5 @@
 			border-radius: 40rpx;
 			font-size: $uni-font-size-sm;
 		}
-	}
-
-	.bottom-nav {
-		position: fixed;
-		bottom: 0;
-		left: 0;
-		right: 0;
-		height: 100rpx;
-		background-color: #fff;
-		display: flex;
-		justify-content: space-around;
-		align-items: center;
-		border-top: 2rpx solid $uni-border-color;
-
-		.nav-item {
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			font-size: $uni-font-size-xs;
-			color: $uni-text-color-light;
-
-			&.active {
-				color: $uni-price-color;
-			}
-
-			.iconfont {
-				font-size: 40rpx;
-				margin-bottom: 4rpx;
-			}
-		}
-	}
-
-	.member-discount-info {
-		color: $uni-price-color;
-		font-size: $uni-font-size-xs;
-		margin-top: 4rpx;
 	}
 </style>

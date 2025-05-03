@@ -72,6 +72,32 @@
 				</view>
 			</view>
 		</view>
+
+		<!-- 用户信息卡片 -->
+		<view class="user-card">
+			<!-- ... existing user card content ... -->
+		</view>
+
+		<!-- 会员信息卡片 -->
+		<view class="membership-card" @click="handleViewMembership">
+			<view class="membership-header">
+				<image class="membership-icon" :src="isMember ? '/static/images/member-active.png' : '/static/images/member-inactive.png'" mode="aspectFit" />
+				<view class="membership-info">
+					<text class="membership-title">{{ isMember ? '尊享会员' : '普通用户' }}</text>
+					<text class="membership-desc">{{ isMember ? `会员有效期至：${expireDate}` : '开通会员，享受专属优惠' }}</text>
+				</view>
+				<text class="arrow-icon">></text>
+			</view>
+			<view class="membership-points" v-if="isMember">
+				<text class="points-label">当前积分</text>
+				<text class="points-value">{{ userPoints }}</text>
+			</view>
+		</view>
+
+		<!-- 其他功能卡片 -->
+		<view class="function-card">
+			<!-- ... existing function card content ... -->
+		</view>
 	</view>
 </template>
 
@@ -86,12 +112,17 @@
 					points: 1258,
 					coupons: 3
 				},
-				isLogin: true // 模拟已登录状态
+				isLogin: true, // 模拟已登录状态
+				isMember: false,
+				userPoints: 0,
+				expireDate: ''
 			}
 		},
 		onLoad() {
 			// 检查登录状态
 			this.checkLoginStatus()
+			this.checkMembershipStatus()
+			this.getUserPoints()
 		},
 		methods: {
 			checkLoginStatus() {
@@ -132,6 +163,29 @@
 				uni.showToast({
 					title: '正在连接客服...',
 					icon: 'none'
+				})
+			},
+			checkMembershipStatus() {
+				const membershipStatus = uni.getStorageSync('membershipStatus');
+				this.isMember = membershipStatus && membershipStatus.expiresAt > new Date().getTime();
+				if (this.isMember) {
+					const expireDate = new Date(membershipStatus.expiresAt);
+					this.expireDate = `${expireDate.getFullYear()}-${String(expireDate.getMonth() + 1).padStart(2, '0')}-${String(expireDate.getDate()).padStart(2, '0')}`;
+				}
+			},
+			getUserPoints() {
+				const userInfo = uni.getStorageSync('userInfo') || {};
+				this.userPoints = userInfo.points || 0;
+			},
+			handleViewMembership() {
+				uni.navigateTo({
+					url: '/pages/user/membership-details',
+					success: () => {
+						console.log('Successfully navigated to membership details page')
+					},
+					fail: (err) => {
+						console.error('Navigation failed:', err)
+					}
 				})
 			}
 		}
@@ -358,6 +412,66 @@
 				font-size: 28rpx;
 				color: #333;
 				font-weight: 500;
+			}
+		}
+	}
+
+	.membership-card {
+		background: #fff;
+		margin: 20rpx;
+		padding: 30rpx;
+		border-radius: 12rpx;
+		box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+
+		.membership-header {
+			display: flex;
+			align-items: center;
+			margin-bottom: 20rpx;
+
+			.membership-icon {
+				width: 80rpx;
+				height: 80rpx;
+				margin-right: 20rpx;
+			}
+
+			.membership-info {
+				flex: 1;
+
+				.membership-title {
+					font-size: 32rpx;
+					font-weight: bold;
+					margin-bottom: 10rpx;
+					display: block;
+				}
+
+				.membership-desc {
+					font-size: 24rpx;
+					color: #666;
+				}
+			}
+
+			.arrow-icon {
+				font-size: 32rpx;
+				color: #999;
+			}
+		}
+
+		.membership-points {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			padding-top: 20rpx;
+			border-top: 2rpx solid #f5f5f5;
+
+			.points-label {
+				font-size: 28rpx;
+				color: #666;
+			}
+
+			.points-value {
+				font-size: 32rpx;
+				font-weight: bold;
+				color: #ff4d4f;
 			}
 		}
 	}
