@@ -267,6 +267,7 @@
 </script>
 
 <style lang="scss" scoped>
+	@import '@/uni.scss';
 	.cart-page {
 		min-height: 100vh;
 		background-color: $uni-bg-color-grey;
