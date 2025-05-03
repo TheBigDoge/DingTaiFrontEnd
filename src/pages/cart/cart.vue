@@ -148,7 +148,7 @@
 			},
 			decreaseLength(index) {
 				const currentItem = this.cartList[index];
-				if (currentItem.length > 0.5) {
+				if (currentItem.length > 0.85) {
 					currentItem.length = parseFloat((currentItem.length - 0.1).toFixed(1));
 					this.saveCartList();
 				} else {

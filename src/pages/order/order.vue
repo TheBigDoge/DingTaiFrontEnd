@@ -198,7 +198,7 @@
 				const item = this.orderItems[index];
 				if (item.isWholePiece) return; // If whole piece mode is on, don't allow quantity changes
 				const newLength = parseFloat((item.length + change).toFixed(1));
-				if (newLength >= 0.5) {
+				if (newLength >= 0.85) {
 					item.length = newLength;
 				}
 			},
