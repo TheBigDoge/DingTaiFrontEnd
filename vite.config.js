@@ -24,7 +24,7 @@ export default defineConfig({
 		open:true
 	}*/
 	// vue.config.js
-  devServer: {
+  server: {
     host: '0.0.0.0',
     port: 30099
   }
