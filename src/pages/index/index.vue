@@ -34,50 +34,31 @@
       </swiper-item>
     </swiper>
 
-    <!-- 分类导航 -->
-    <view class="category-nav">
-      <view class="nav-item" v-for="(item, index) in categoryList" :key="index" @tap="handleCategoryClick(item)">
-        <view class="nav-icon-container"></view>
-        <text class="nav-text">{{ item.name }}</text>
+    <!-- Category Navigation -->
+    <view class="category-section">
+      <view class="category-title">分类导航</view>
+      <view class="category-list">
+        <view class="category-item" v-for="(item, index) in categoryList" :key="index" @click="handleCategoryClick(item)">
+          <image class="category-icon" :src="item.icon" mode="aspectFit" />
+          <text class="category-name">{{ item.name }}</text>
+        </view>
       </view>
     </view>
 
-    <!-- 商品列表 -->
+    <!-- Product List -->
     <view class="product-section">
       <view class="section-header">
-        <text class="title">热门面料</text>
-        <text class="more" @click="handleViewMore">查看更多</text>
+        <text class="section-title">新品推荐</text>
+        <text class="view-more" @click="handleViewMore">查看更多</text>
       </view>
-      <view class="product-grid">
-        <product-card v-for="(item, index) in productList" :key="index" :product="item"
-          @click="handleProductClick(item)"></product-card>
-      </view>
-    </view>
-
-    <!-- 会员专区 -->
-    <view class="membership-section">
-      <view class="section-header">
-        <text class="title">会员专区</text>
-        <text class="more">查看更多</text>
-      </view>
-      <view class="membership-content" @click="handleViewMembership">
-        <view class="membership-card" :class="{ 'active': isTouching }" @touchstart="isTouching = true" @touchend="isTouching = false">
-          <view class="membership-info">
-            <text class="membership-title">开通会员</text>
-            <text class="membership-desc">享受全场9折优惠</text>
-          </view>
-          <view class="membership-benefits">
-            <view class="benefit-item">
-              <text class="benefit-icon">✓</text>
-              <text class="benefit-text">全场商品9折</text>
-            </view>
-            <view class="benefit-item">
-              <text class="benefit-icon">✓</text>
-              <text class="benefit-text">专属客服</text>
-            </view>
-            <view class="benefit-item">
-              <text class="benefit-icon">✓</text>
-              <text class="benefit-text">优先发货</text>
+      <view class="product-list">
+        <view class="product-item" v-for="(item, index) in productList" :key="index" @click="handleProductClick(item)">
+          <image class="product-image" :src="item.image" mode="aspectFit" />
+          <view class="product-info">
+            <text class="product-name text-ellipsis-2">{{ item.name }}</text>
+            <view class="product-price">
+              <text class="member-price">¥{{ (item.price * 0.9).toFixed(2) }}</text>
+              <text class="original-price">¥{{ item.price }}</text>
             </view>
           </view>
         </view>
@@ -172,7 +153,8 @@
         ],
         productList: [],
         searchKeyword: '',
-        isTouching: false
+        showSearchResults: false,
+        searchResults: []
       }
     },
     computed: {
@@ -222,18 +204,7 @@
       },
       handleViewMore() {
         uni.switchTab({
-          url: '/pages/category/category'
-        })
-      },
-      handleViewMembership() {
-        uni.switchTab({
-          url: '/pages/membership/membership',
-          success: () => {
-            console.log('Successfully navigated to membership page')
-          },
-          fail: (err) => {
-            console.error('Navigation failed:', err)
-          }
+          url: '/pages/product/list'
         })
       },
       onPullDownRefresh() {
@@ -285,71 +256,108 @@
     }
   }
 
-  .category-nav {
-    display: flex;
-    justify-content: space-around;
-    padding: $uni-spacing-md $uni-spacing-sm;
+  .category-section {
     background-color: #fff;
-    margin-bottom: $uni-spacing-md;
+    padding: 30rpx;
+    margin-bottom: 20rpx;
 
-    .nav-item {
+    .category-title {
+      font-size: 32rpx;
+      font-weight: bold;
+      margin-bottom: 20rpx;
+    }
+
+    .category-list {
       display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: 25%;
-      padding: 10rpx;
-      transition: all 0.3s ease;
+      flex-wrap: wrap;
+      justify-content: space-between;
 
-      &:active {
-        opacity: 0.7;
-        transform: scale(0.95);
-      }
+      .category-item {
+        width: 25%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 20rpx;
 
-      .nav-icon-container {
-        width: 100rpx;
-        height: 100rpx;
-        border-radius: 50%;
-        background-color: #f5f5f5;
-        border: 2rpx solid #ddd;
-        margin-bottom: $uni-spacing-xs;
-      }
+        .category-icon {
+          width: 100rpx;
+          height: 100rpx;
+          margin-bottom: 10rpx;
+        }
 
-      .nav-text {
-        font-size: $uni-font-size-sm;
-        color: $uni-text-color;
-        text-align: center;
+        .category-name {
+          font-size: 24rpx;
+          color: #333;
+        }
       }
     }
   }
 
   .product-section {
-    padding: 0 $uni-spacing-sm;
+    background-color: #fff;
+    padding: 30rpx;
 
     .section-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: $uni-spacing-md;
+      margin-bottom: 20rpx;
 
-      .title {
-        font-size: $uni-font-size-lg;
+      .section-title {
+        font-size: 32rpx;
         font-weight: bold;
-        color: $uni-text-color;
       }
 
-      .more {
-        font-size: $uni-font-size-sm;
-        color: #999;
+      .view-more {
+        font-size: 24rpx;
+        color: #666;
       }
     }
 
-    .product-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: $uni-spacing-sm;
+    .product-list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
 
-      :deep(.product-card) {
-        margin-bottom: 0;
+      .product-item {
+        width: 48%;
+        margin-bottom: 20rpx;
+        background-color: #f8f8f8;
+        border-radius: 10rpx;
+        overflow: hidden;
+
+        .product-image {
+          width: 100%;
+          height: 300rpx;
+        }
+
+        .product-info {
+          padding: 20rpx;
+
+          .product-name {
+            font-size: 24rpx;
+            color: #333;
+            margin-bottom: 10rpx;
+          }
+
+          .product-price {
+            display: flex;
+            align-items: baseline;
+
+            .member-price {
+              font-size: 28rpx;
+              color: #ff4d4f;
+              font-weight: bold;
+              margin-right: 10rpx;
+            }
+
+            .original-price {
+              font-size: 24rpx;
+              color: #999;
+              text-decoration: line-through;
+            }
+          }
+        }
       }
     }
   }
@@ -413,87 +421,6 @@
       padding: 100rpx 0;
       color: #999;
       font-size: 28rpx;
-    }
-  }
-
-  .membership-section {
-    margin: $uni-spacing-md;
-    background-color: #fff;
-    border-radius: $uni-border-radius-lg;
-    overflow: hidden;
-
-    .section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: $uni-spacing-md;
-      border-bottom: 2rpx solid $uni-border-color;
-
-      .title {
-        font-size: $uni-font-size-lg;
-        font-weight: bold;
-      }
-
-      .more {
-        font-size: $uni-font-size-sm;
-        color: #999;
-      }
-    }
-
-    .membership-content {
-      padding: $uni-spacing-md;
-      cursor: pointer;
-    }
-
-    .membership-card {
-      background: linear-gradient(135deg, #ff4d4f, #ff7875);
-      border-radius: $uni-border-radius-lg;
-      padding: $uni-spacing-lg;
-      color: #fff;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-
-      &.active {
-        transform: scale(0.98);
-        box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
-      }
-
-      .membership-info {
-        margin-bottom: $uni-spacing-md;
-
-        .membership-title {
-          font-size: $uni-font-size-lg;
-          font-weight: bold;
-          display: block;
-          margin-bottom: $uni-spacing-xs;
-        }
-
-        .membership-desc {
-          font-size: $uni-font-size-sm;
-          opacity: 0.9;
-        }
-      }
-
-      .membership-benefits {
-        .benefit-item {
-          display: flex;
-          align-items: center;
-          margin-bottom: $uni-spacing-sm;
-
-          .benefit-icon {
-            width: 36rpx;
-            height: 36rpx;
-            line-height: 36rpx;
-            text-align: center;
-            background-color: rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            margin-right: $uni-spacing-sm;
-          }
-
-          .benefit-text {
-            font-size: $uni-font-size-sm;
-          }
-        }
-      }
     }
   }
 </style>
