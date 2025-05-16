@@ -15,7 +15,7 @@
 			<view class="status-benefits" v-if="isMember">
 				<view class="benefit-item">
 					<text class="benefit-icon">✓</text>
-					<text class="benefit-text">全场商品9折优惠</text>
+					<text class="benefit-text">全场商品8折优惠</text>
 				</view>
 				<view class="benefit-item">
 					<text class="benefit-icon">✓</text>
@@ -62,7 +62,7 @@
 					<image class="benefit-image" src="/static/images/discount.png" mode="aspectFit" />
 					<view class="benefit-content">
 						<text class="benefit-title">专属折扣</text>
-						<text class="benefit-desc">全场商品享受9折优惠</text>
+						<text class="benefit-desc">全场商品享受8折优惠</text>
 					</view>
 				</view>
 				<view class="benefit-card">

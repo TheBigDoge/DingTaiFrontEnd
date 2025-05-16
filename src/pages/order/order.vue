@@ -122,8 +122,8 @@
 				}, 0);
 			},
 			discount() {
-				// 会员9折优惠
-				return this.totalAmount * 0.1;
+				// 会员8折优惠
+				return this.totalAmount * 0.2;
 			},
 			finalAmount() {
 				return this.totalAmount - this.discount + this.shippingFee;

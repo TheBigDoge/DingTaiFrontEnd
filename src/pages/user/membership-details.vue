@@ -34,7 +34,7 @@
           <image class="benefit-icon" src="/static/images/discount.png" mode="aspectFit" />
           <view class="benefit-info">
             <text class="benefit-title">专属折扣</text>
-            <text class="benefit-desc">全场商品享受9折优惠</text>
+            <text class="benefit-desc">全场商品享受8折优惠</text>
           </view>
         </view>
         <view class="benefit-item">

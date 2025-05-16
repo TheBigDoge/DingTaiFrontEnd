@@ -100,7 +100,7 @@
 				return this.cartList
 					.filter(item => item.selected)
 					.reduce((total, item) => {
-						const itemTotal = item.unitPrice * item.length * 0.9; // Apply member discount
+						const itemTotal = item.unitPrice * item.length * 0.8; // Apply member discount
 						return total + itemTotal;
 					}, 0).toFixed(2)
 			},

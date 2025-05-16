@@ -60,6 +60,25 @@
 			"style": {
 				"navigationBarTitleText": "我的订单"
 			}
+		},
+		{
+			"path": "pages/membership/membership",
+			"style": {
+				"navigationBarTitleText": "会员中心"
+			}
+		},
+		{
+			"path": "pages/membership/detail",
+			"style": {
+				"navigationBarTitleText": "会员详情"
+			}
+		},
+		{
+			"path": "pages/user/login",
+			"style": {
+				"navigationBarTitleText": "登录/注册",
+				"navigationStyle": "custom"
+			}
 		}
 	],
 	"tabBar": {

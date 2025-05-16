@@ -57,7 +57,7 @@
           <view class="product-info">
             <text class="product-name text-ellipsis-2">{{ item.name }}</text>
             <view class="product-price">
-              <text class="member-price">¥{{ (item.price * 0.9).toFixed(2) }}</text>
+              <text class="member-price">¥{{ (item.price * 0.8).toFixed(2) }}</text>
               <text class="original-price">¥{{ item.price }}</text>
             </view>
           </view>
