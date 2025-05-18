@@ -20,7 +20,7 @@
 	</view>
 </template>
 
-<script>
+<script lang="ts">
 	export default {
 		name: 'SearchBar',
 		props: {
@@ -36,7 +36,7 @@
 		data() {
 			return {
 				searchText: '',
-				searchHistory: []
+				searchHistory: [] as string[],
 			}
 		},
 		created() {
@@ -45,19 +45,21 @@
 		},
 		methods: {
 			handleSearch() {
-				if (!this.searchText.trim()) return;
-				
-				// Add to search history
-				this.addToHistory(this.searchText);
+				this.searchText = this.searchText.trim();
+
+				if (this.searchText) {
+					// Add to search history
+					this.addToHistory(this.searchText);
+				}
 				
 				// Emit search event
 				this.$emit('search', this.searchText);
 			},
-			selectTag(tag) {
+			selectTag(tag: string) {
 				this.searchText = tag;
-				this.$emit('search', tag);
+				this.handleSearch();
 			},
-			addToHistory(keyword) {
+			addToHistory(keyword: string) {
 				// Remove if already exists
 				this.searchHistory = this.searchHistory.filter(item => item !== keyword);
 				// Add to beginning

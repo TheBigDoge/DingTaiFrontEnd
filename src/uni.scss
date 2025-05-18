@@ -158,12 +158,6 @@ page {
 .member-price {
 	color: $uni-price-color;
 	font-size: $uni-font-size-sm;
-
-	&::before {
-		content: '会员价：';
-		color: $uni-text-color-light;
-		font-size: $uni-font-size-xs;
-	}
 }
 
 .original-price {

@@ -4,34 +4,53 @@
 		<view class="product-info">
 			<text class="product-name">{{ product.name }}</text>
 			<view class="price-row">
-				<view class="member-price">
-					<!-- <text class="label">会员价：</text> -->
-					<text class="price">¥{{ product.memberPrice }}<text class="unit">/m</text></text>
+				<view>
+					会员价：
+					<text class="price"> ¥{{ product.memberPrice }}</text> 
+					<text class="unit">/m</text>
 				</view>
-				<text class="original-price">¥{{ product.price }}/m</text>
+				<view>
+					原价:
+					<text class="original-price-cancel" v-if="isPremium"> ¥{{ product.price }}/m </text>
+					<text class="original-price" v-if="!isPremium"> ¥{{ product.price }}/m </text>
+				</view>
 			</view>
 		</view>
 	</view>
 </template>
 
-<script>
+<script lang="ts">
+	import { Product } from '@/api/product';
+	import { GlobalData } from '@/store';
+	import { PropType } from 'vue';
+
 	export default {
 		name: 'ProductCard',
 		props: {
 			product: {
-				type: Object,
+				type: Object as () => Product,
 				required: true,
-				default: () => ({
-					image: '',
-					name: '',
-					memberPrice: 0,
-					price: 0
-				})
+			},
+			onclick: {
+				type: Function as PropType<(product: Product) => void>,
+				required: false,
+			}
+		},
+		data() {
+			return {
+				user: GlobalData.get_user(),
+				isPremium: GlobalData.is_premium(),
 			}
 		},
 		methods: {
 			handleClick() {
-				this.$emit('click', this.product)
+				if (this.onclick) {
+					this.onclick(this.product);
+				} else {
+					uni.navigateTo({
+						url: `/pages/product/detail?id=${this.product.id}`
+					})
+				}
 			}
 		}
 	}
@@ -94,10 +113,18 @@
 					}
 				}
 
-				.original-price {
+				.original-price-cancel {
 					font-size: 24rpx;
 					color: #999;
 					text-decoration: line-through;
+					white-space: nowrap;
+					margin-left: 10rpx;
+				}
+
+				.original-price {
+					font-size: 24rpx;
+					color: black;
+					text-decoration: none;
 					white-space: nowrap;
 					margin-left: 10rpx;
 				}

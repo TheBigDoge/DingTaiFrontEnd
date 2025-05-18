@@ -2,21 +2,63 @@
 	<view class="product-detail">
 		<!-- 商品轮播图 -->
 		<swiper class="product-swiper" circular indicator-dots :autoplay="false" :duration="500">
-			<swiper-item v-for="(item, index) in product.images" :key="index">
-				<image :src="item" mode="aspectFill" class="slide-image" />
+			<swiper-item v-for="(item, index) in product?.media" :key="index">
+				<image :src="item.image.url" mode="aspectFill" class="slide-media" v-if="item.type === 'image'" />
+				<video
+					v-if="item.type === 'video'"
+					:src="item.video.url"
+					controls
+					autoplay
+					loop
+					muted
+					objectFit='contain'
+					class='slide-media'
+				></video>
 			</swiper-item>
 		</swiper>
 
 		<!-- 商品基本信息 -->
 		<view class="product-info card">
-			<view class="product-name">{{ product.name }}</view>
-			<view class="product-code">商品编号：{{ product.code }}</view>
+			<view class="product-name">
+				{{ product?.name }}
+			</view>
+			<view class="product-code">
+				<text>
+					商品编号：{{ product?.number }}
+				</text>
+
+				<text v-if="product?.vip_only" class="tag">
+					会员专享
+				</text>
+			</view>
 			<view class="price-row">
-				<view class="price-info">
-					<text class="member-price">¥{{ product.memberPrice }}<text class="price-unit">/m</text></text>
-					<text class="original-price">¥{{ product.price }}/m</text>
+				<view class="price-info" v-if="product?.vip_only">
+					<text class="price-label">会员价:</text>
+					<text class="member-price">¥{{ product?.memberPrice }}<text class="price-unit">/m</text></text>
 				</view>
-				<view class="sales-info">销量 {{ product.sales }}</view>
+				<view class="price-info" v-else>
+					<view v-if="isPremium">
+						<text class="member-price">
+							<text class="price-label">会员价:</text>
+							¥{{ product?.memberPrice }}<text class="price-unit">/m</text>
+						</text>
+						<text class="original-price-cancel" style="margin-left: 30rpx">
+							<text class="price-label">原价:</text>
+							¥{{ product?.price }}/m
+						</text>
+					</view>
+					<view v-else>
+						<text class="original-price">
+							<text class="price-label">价格:</text>
+							¥{{ product?.price }}/m
+						</text>
+						<text class="member-price" style="margin-left: 30rpx">
+							<text class="price-label">会员价:</text>
+							¥{{ product?.memberPrice }}<text class="price-unit">/m</text>
+						</text>
+					</view>
+				</view>
+				<view class="sales-info">销量 {{ product?.order_quantity }}</view>
 			</view>
 		</view>
 
@@ -25,13 +67,23 @@
 			<view class="section-title">长度选择</view>
 			<view class="specs-list">
 				<view class="spec-group">
-					<view class="spec-title">长度(m)</view>
+					<view class="spec-title">
+						长度(m)
+						<text
+							v-if="!product?.allow_partial_sale"
+							class="tag"
+							style="margin-left: 40rpx; color: red; border: 1px solid red"
+						> 非拆分售卖品
+						</text>
+					</view>
 					<view class="length-input-container" :class="{ disabled: isWholePiece }">
 						<view class="length-control" @click="decreaseLength" :class="{ disabled: isWholePiece }">-</view>
 						<input type="digit" class="length-input" v-model="lengthInput" @blur="validateLength" :disabled="isWholePiece" />
 						<view class="length-control" @click="increaseLength" :class="{ disabled: isWholePiece }">+</view>
 					</view>
-					<view class="length-tips">以0.1m为单位增减，最小0.85m，最大{{ maxLength }}m</view>
+					<view class="length-tips">
+						以0.1m为单位增减，最小{{product?.min_order_stock}}m，最大{{ product?.available_stock }}m
+					</view>
 					<view class="buy-whole-container">
 						<view class="buy-whole-btn" :class="{ active: isWholePiece }" @click="toggleWholePiece">
 							<text class="btn-text">整块购买</text>
@@ -42,7 +94,7 @@
 				<!-- 显示总价 -->
 				<view class="total-price-section">
 					<view class="spec-title">总价</view>
-					<view class="total-price">¥{{ calculateTotalPrice }}</view>
+					<view class="total-price">{{ totalPriceDisplay() }}</view>
 				</view>
 			</view>
 		</view>
@@ -51,9 +103,7 @@
 		<view class="detail-section card">
 			<view class="section-title">商品详情</view>
 			<view class="detail-content">
-				<image v-for="(item, index) in product.detailImages" :key="index" :src="item" mode="widthFix"
-					class="detail-image" />
-				<view class="detail-text">{{ product.description }}</view>
+				<view class="detail-text">{{ product?.description }}</view>
 			</view>
 		</view>
 
@@ -67,95 +117,121 @@
 	</view>
 </template>
 
-<script>
+<script lang="ts">
+	import { AddCartItem, AddCartItemRequest } from '@/api/cart';
+	import { GetProductById, newProduct, Product } from '@/api/product';
+import { GlobalData } from '@/store';
+
 	export default {
 		data() {
 			return {
-				id: null,
-				product: {
-					name: '意大利进口羊毛面料 精选VBC面料',
-					code: 'VBC20240001',
-					memberPrice: 100,
-					price: 128,
-					sales: 359,
-					images: [
-						'/static/images/products/italian-wool-main.jpg',
-						'/static/images/products/italian-wool-texture.jpg',
-						'/static/images/products/italian-wool-detail.jpg'
-					],
-					detailImages: [
-						'/static/images/products/italian-wool-usage1.jpg',
-						'/static/images/products/italian-wool-usage2.jpg'
-					],
-					description: '意大利VBC面料，100%羊毛，适合定制高级西装、外套等服装。面料手感柔软，垂顺度好，清晰的格纹图案彰显品味。'
-				},
-				lengthInput: '2.0',
-				minLength: 0.85,
-				maxLength: 10.0,
+				id: null as null | number,
+				product: null as null | Product,
+				lengthInput: 0.0,
 				isWholePiece: false
 			}
 		},
 		computed: {
-			// 计算总价
-			calculateTotalPrice() {
-				const length = parseFloat(this.lengthInput) || 0;
-				const unitPrice = this.product.memberPrice || 0;
-				return (length * unitPrice).toFixed(2);
-			}
+			isPremium(): boolean {
+				return GlobalData.is_premium();
+			},
 		},
-		onLoad(options) {
-			if (options.id) {
+		onLoad(options: any) {
+			if (options?.id) {
 				this.id = options.id
-				// 实际项目中，这里应该根据id请求商品详情
-				// this.loadProductDetail(this.id)
+				this.loadProductDetail();
 			}
 		},
 		methods: {
-			loadProductDetail(id) {
-				// 实际项目中，这里应该请求接口获取商品详情
-				console.log('加载商品详情，ID：', id)
+			loadProductDetail() {
+				if (this.id) {
+					GetProductById(this.id)
+						.then(newProduct)
+						.then(product => {
+							this.product = product;
+							this.isWholePiece = !this.product.allow_partial_sale;
+							this.lengthInput = this.isWholePiece ? this.product.available_stock : this.product.min_order_stock;
+						});
+				}
 			},
+			calculateTotalPrice() {
+				if (!this.product) {
+					return 0;
+				}
+
+				if (this.product.vip_only && !this.isPremium) {
+					// 不允许购买
+					return 0;
+				}
+
+				const price = this.isPremium ? this.product.memberPrice : this.product.price;
+				const total = parseFloat((price * this.lengthInput).toFixed(2));
+				return total;
+			},
+
+			totalPriceDisplay(): string {
+				const price = this.calculateTotalPrice();
+				if (!price) {
+					return "无法购买"
+				} else {
+					return `¥${price}`;
+				}
+			},
+
 			decreaseLength() {
 				if (this.isWholePiece) return;
-				let currentValue = parseFloat(this.lengthInput);
-				if (currentValue > this.minLength) {
+				if (!this.product) return;
+
+				let currentValue = this.lengthInput;
+				if (currentValue > this.product.min_order_stock) {
 					// 减少0.1m并保留一位小数
-					currentValue = Math.max(this.minLength, (currentValue - 0.1).toFixed(1));
-					this.lengthInput = currentValue.toString();
+					currentValue = Math.max(this.product.min_order_stock, parseFloat((currentValue - 0.1).toFixed(1)));
+					this.lengthInput = currentValue;
 				}
 			},
 			increaseLength() {
 				if (this.isWholePiece) return;
-				let currentValue = parseFloat(this.lengthInput);
-				if (currentValue < this.maxLength) {
+				if (!this.product) return;
+
+				let currentValue = this.lengthInput;
+				if (currentValue < this.product.available_stock) {
 					// 增加0.1m并保留一位小数
-					currentValue = Math.min(this.maxLength, (currentValue + 0.1).toFixed(1));
-					this.lengthInput = currentValue.toString();
+					currentValue = Math.min(this.product.available_stock, parseFloat((currentValue + 0.1).toFixed(1)));
+					this.lengthInput = currentValue;
 				}
 			},
 			validateLength() {
+				if (!this.product) {
+					uni.showToast({ title: '产品不存在'});
+					return;
+				}
+
 				if (this.isWholePiece) {
-					this.lengthInput = this.maxLength.toFixed(1);
+					this.lengthInput = this.product?.available_stock;
 					return;
 				}
 				// 确保输入是有效数字
-				let value = parseFloat(this.lengthInput);
+				let value = this.lengthInput;
 
 				// 如果不是有效数字，设置为最小值
 				if (isNaN(value)) {
-					value = this.minLength;
+					value = this.product.min_order_stock;
 				}
 
 				// 限制在允许范围内
-				value = Math.max(this.minLength, Math.min(this.maxLength, value));
+				value = Math.max(this.product.min_order_stock, Math.min(this.product.available_stock, value));
 
 				// 四舍五入到最接近的0.1
 				value = Math.round(value * 10) / 10;
 
 				// 格式化为一位小数
-				this.lengthInput = value.toFixed(1);
+				this.lengthInput = parseFloat(value.toFixed(1));
 			},
 			handleAddToCart() {
+				if (!this.product) {
+					return;
+				}
+
 				if (!this.lengthInput) {
 					uni.showToast({
 						title: '请输入长度',
@@ -164,59 +240,20 @@
 					return
 				}
 
-				uni.showLoading({
-					title: '正在加入...'
-				})
+				uni.showLoading({ title: '正在加入购物车' })
 
 				// 构建购物车项目数据
 				const cartItem = {
-					id: this.product.id || this.id,
-					name: this.product.name,
-					image: this.product.images[0],
-					length: parseFloat(this.lengthInput),
-					unitPrice: this.product.memberPrice,
-					selected: false
-				};
+					product_id: this.product.id,
+					is_partial_sale: !this.isWholePiece,
+					stock: (this.isWholePiece ? 0 : this.lengthInput) * 100,
+				} as AddCartItemRequest;
 
-				try {
-					// 获取现有购物车数据
-					const cartList = uni.getStorageSync('cartList') || [];
-					
-					// 检查是否已存在相同商品（相同ID和长度）
-					const existingItemIndex = cartList.findIndex(item => 
-						item.id === cartItem.id && item.length === cartItem.length
-					);
-
-					if (existingItemIndex !== -1) {
-						// 如果已存在，增加数量
-						cartList[existingItemIndex].selected = true;
-					} else {
-						// 如果不存在，添加新项目
-						cartList.push(cartItem);
-					}
-
-					// 保存更新后的购物车数据
-					uni.setStorageSync('cartList', cartList);
-
-					uni.hideLoading();
-					uni.showToast({
-						title: '加入购物车成功',
-						icon: 'success',
-						success: () => {
-							// Update the cart page path
-							// uni.switchTab({
-							//     url: '/pages/cart/cart'
-							// });
-						}
+				AddCartItem(cartItem)
+					.then(() => {
+						uni.hideLoading();
+						uni.showToast({title: '加入购物车成功'});
 					});
-				} catch (e) {
-					console.error('添加到购物车失败:', e);
-					uni.hideLoading();
-					uni.showToast({
-						title: '添加失败，请重试',
-						icon: 'error'
-					});
-				}
 			},
 			handleBuyNow() {
 				if (!this.lengthInput) {
@@ -228,64 +265,65 @@
 				}
 
 				// 构建订单数据
-				const orderData = {
-					items: [{
-						id: this.product.id || this.id,
-						name: this.product.name,
-						image: this.product.images[0],
-						length: parseFloat(this.lengthInput),
-						unitPrice: this.product.memberPrice,
-						subtotal: parseFloat(this.calculateTotalPrice)
-					}],
-					totalAmount: parseFloat(this.calculateTotalPrice),
-					discount: 0,
-					finalAmount: parseFloat(this.calculateTotalPrice)
-				};
+				// const orderData = {
+				// 	items: [{
+				// 		id: this.product.id || this.id,
+				// 		name: this.product.name,
+				// 		image: this.product.images[0],
+				// 		length: parseFloat(this.lengthInput),
+				// 		unitPrice: this.product.memberPrice,
+				// 		subtotal: parseFloat(this.calculateTotalPrice)
+				// 	}],
+				// 	totalAmount: parseFloat(this.calculateTotalPrice),
+				// 	discount: 0,
+				// 	finalAmount: parseFloat(this.calculateTotalPrice)
+				// };
 
-				try {
-					// 保存订单数据到本地存储
-					uni.setStorageSync('currentOrder', orderData);
+				// try {
+				// 	// 保存订单数据到本地存储
+				// 	uni.setStorageSync('currentOrder', orderData);
 					
-					// Update the order page path
-					uni.navigateTo({
-						url: '/pages/order/order',
-						success: () => {
-							console.log('Navigation successful');
-						},
-						fail: (err) => {
-							console.error('Navigation failed:', err);
-							uni.showToast({
-								title: '页面跳转失败',
-								icon: 'error'
-							});
-						}
-					});
-				} catch (e) {
-					console.error('处理订单失败:', e);
-					uni.showToast({
-						title: '处理订单失败，请重试',
-						icon: 'error'
-					});
-				}
-			},
-			buyWholePiece() {
-				// Set the length to the maximum allowed value
-				this.lengthInput = this.maxLength.toFixed(1);
-				uni.showToast({
-					title: '已设置为整块购买',
-					icon: 'success'
-				});
+				// 	// Update the order page path
+				// 	uni.navigateTo({
+				// 		url: '/pages/order/order',
+				// 		success: () => {
+				// 			console.log('Navigation successful');
+				// 		},
+				// 		fail: (err) => {
+				// 			console.error('Navigation failed:', err);
+				// 			uni.showToast({
+				// 				title: '页面跳转失败',
+				// 				icon: 'error'
+				// 			});
+				// 		}
+				// 	});
+				// } catch (e) {
+				// 	console.error('处理订单失败:', e);
+				// 	uni.showToast({
+				// 		title: '处理订单失败，请重试',
+				// 		icon: 'error'
+				// 	});
+				// }
 			},
 			toggleWholePiece() {
+				if (!this.product) {
+					return;
+				}
+
+				if (!this.product.allow_partial_sale) {
+					return;
+				}
+
 				this.isWholePiece = !this.isWholePiece;
 				if (this.isWholePiece) {
-					this.lengthInput = this.maxLength.toFixed(1);
+					this.lengthInput = parseFloat(this.product.available_stock.toFixed(1));
 					uni.showToast({
 						title: '已设置为整块购买',
-						icon: 'success'
+						//icon: 'success'
+						icon: 'none'
 					});
 				} else {
-					this.lengthInput = this.minLength.toFixed(1);
+					this.lengthInput = parseFloat(this.product.min_order_stock.toFixed(1));
 					uni.showToast({
 						title: '已取消整块购买',
 						icon: 'none'
@@ -301,11 +339,27 @@
 		padding-bottom: 140rpx;
 	}
 
+	.tag {
+		font-size: 24rpx;
+		color: #4d71ff;
+		border: 1rpx solid #4d71ff;
+		padding: 2rpx 10rpx 3rpx 10rpx;
+		border-radius: 4rpx;
+		margin-left: 30rpx;
+		text-align: center;
+	}
+
+	.price-label {
+		color: $uni-text-color-light;
+		font-size: $uni-font-size-xs;
+		margin-right: 8rpx;
+	}
+
 	.product-swiper {
 		width: 100%;
 		height: 750rpx;
 
-		.slide-image {
+		.slide-media {
 			width: 100%;
 			height: 100%;
 		}
@@ -351,10 +405,16 @@
 					}
 				}
 
-				.original-price {
+				.original-price-cancel {
 					font-size: $uni-font-size-sm;
 					color: $uni-text-color-light;
 					text-decoration: line-through;
+				}
+
+				.original-price {
+					font-size: $uni-font-size-sm;
+					color: $uni-text-color-light;
+					text-decoration: none;
 				}
 			}
 
@@ -463,7 +523,7 @@
 					}
 
 					.btn-text {
-						margin-right: 8rpx;
+						text-align: center;
 					}
 				}
 			}

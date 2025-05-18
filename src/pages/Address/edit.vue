@@ -2,25 +2,25 @@
 	<view class="edit-address-page">
 		<!-- Header -->
 		<view class="page-header">
-			<text class="header-title">{{ isEdit ? '编辑地址' : '新增地址' }}</text>
+			<text class="header-title">{{ address.id ? '编辑地址' : '新增地址' }}</text>
 		</view>
 
 		<!-- Form -->
 		<view class="form-content">
 			<view class="form-item">
 				<text class="label">收货人</text>
-				<input type="text" v-model="formData.name" placeholder="请输入收货人姓名" />
+				<input type="text" v-model="address.name" placeholder="请输入收货人姓名" />
 			</view>
 			<view class="form-item">
 				<text class="label">手机号码</text>
-				<input type="number" v-model="formData.phone" placeholder="请输入手机号码" maxlength="11" />
+				<input type="number" v-model="address.phone" placeholder="请输入手机号码" maxlength="11" />
 			</view>
 			<view class="form-item">
 				<text class="label">所在地区</text>
-				<picker mode="region" @change="handleRegionChange" :value="[formData.province, formData.city, formData.district]">
+				<picker mode="region" @change="handleRegionChange" :value="[address.province, address.city, address.district]">
 					<view class="picker-value">
-						<text v-if="formData.province || formData.city || formData.district">
-							{{ formData.province }} {{ formData.city }} {{ formData.district }}
+						<text v-if="address.province || address.city || address.district">
+							{{ address.province }} {{ address.city }} {{ address.district }}
 						</text>
 						<text v-else class="placeholder">请选择省市区</text>
 					</view>
@@ -28,11 +28,11 @@
 			</view>
 			<view class="form-item">
 				<text class="label">详细地址</text>
-				<textarea v-model="formData.detail" placeholder="请输入详细地址，如街道、门牌号等" />
+				<textarea v-model="address.address" placeholder="请输入详细地址，如街道、门牌号等"></textarea>
 			</view>
 			<view class="form-item switch-item">
 				<text class="label">设为默认地址</text>
-				<switch :checked="formData.isDefault" @change="handleDefaultChange" color="#ff4d4f" />
+				<switch :checked="address.isDefault" @change="handleDefaultChange" color="#ff4d4f" />
 			</view>
 		</view>
 
@@ -41,69 +41,80 @@
 	</view>
 </template>
 
-<script>
+<script lang="ts">
+import { Address, createAddress, listAddresses, newAddress, updateAddress } from '@/api/address';
+
 	export default {
 		data() {
 			return {
-				isEdit: false,
-				editIndex: -1,
-				formData: {
+				address: {
+					id: 0,
 					name: '',
 					phone: '',
 					province: '',
 					city: '',
 					district: '',
-					detail: '',
-					isDefault: false
-				}
+					address: '',
+					isDefault: false,
+					tags: [],
+				} as Address,
 			}
 		},
-		onLoad(options) {
-			if (options.index !== undefined) {
-				this.isEdit = true;
-				this.editIndex = parseInt(options.index);
+		onLoad(options: any) {
+			console.log('onload, opts', options)
+			if (options?.id) {
+				this.address.id = parseInt(options.id);
 				this.loadAddress();
 			}
 		},
 		methods: {
 			loadAddress() {
-				const addressList = uni.getStorageSync('addressList') || [];
-				if (this.editIndex >= 0 && this.editIndex < addressList.length) {
-					this.formData = { ...addressList[this.editIndex] };
+				if (this.address.id) {
+					listAddresses()
+						.then(result => result.results)
+						.then(addresses => addresses.filter(addr => addr.id === this.address.id))
+						.then(addresses => {
+							if (addresses) {
+								const first = newAddress(addresses[0]);
+								this.address = first;
+							} else {
+								this.address.id = 0;
+							}
+						})
 				}
 			},
-			handleRegionChange(e) {
+			handleRegionChange(e: any) {
 				const [province, city, district] = e.detail.value;
-				this.formData.province = province;
-				this.formData.city = city;
-				this.formData.district = district;
+				this.address.province = province;
+				this.address.city = city;
+				this.address.district = district;
 			},
-			handleDefaultChange(e) {
-				this.formData.isDefault = e.detail.value;
+			handleDefaultChange(e: any) {
+				this.address.isDefault = e.detail.value;
 			},
 			validateForm() {
-				if (!this.formData.name) {
+				if (!this.address.name) {
 					uni.showToast({
 						title: '请输入收货人姓名',
 						icon: 'none'
 					});
 					return false;
 				}
-				if (!this.formData.phone || !/^1\d{10}$/.test(this.formData.phone)) {
+				if (!this.address.phone || !/^1\d{10}$/.test(this.address.phone)) {
 					uni.showToast({
 						title: '请输入正确的手机号码',
 						icon: 'none'
 					});
 					return false;
 				}
-				if (!this.formData.province || !this.formData.city || !this.formData.district) {
+				if (!this.address.province || !this.address.city || !this.address.district) {
 					uni.showToast({
 						title: '请选择所在地区',
 						icon: 'none'
 					});
 					return false;
 				}
-				if (!this.formData.detail) {
+				if (!this.address.address) {
 					uni.showToast({
 						title: '请输入详细地址',
 						icon: 'none'
@@ -115,37 +126,13 @@
 			saveAddress() {
 				if (!this.validateForm()) return;
 
-				let addressList = uni.getStorageSync('addressList') || [];
-
-				// If setting as default, remove default from other addresses
-				if (this.formData.isDefault) {
-					addressList.forEach(item => item.isDefault = false);
-				}
-
-				if (this.isEdit) {
-					// Update existing address
-					addressList[this.editIndex] = { ...this.formData };
+				if (this.address.id) {
+					updateAddress(this.address)
+						.then(() => uni.navigateBack())
 				} else {
-					// Add new address
-					addressList.push({ ...this.formData });
+					createAddress(this.address)
+						.then(() => uni.navigateBack())
 				}
-
-				// If this is the first address, set it as default
-				if (addressList.length === 1) {
-					addressList[0].isDefault = true;
-				}
-
-				// Save to storage
-				uni.setStorageSync('addressList', addressList);
-
-				uni.showToast({
-					title: this.isEdit ? '地址修改成功' : '地址添加成功',
-					icon: 'success'
-				});
-
-				setTimeout(() => {
-					uni.navigateBack();
-				}, 1500);
 			}
 		}
 	}
@@ -188,7 +175,7 @@
 				height: 88rpx;
 				border: 2rpx solid $uni-border-color;
 				border-radius: 8rpx;
-				padding: 0 30rpx;
+				padding: 30rpx;
 				font-size: 28rpx;
 				background-color: #f8f8f8;
 				transition: all 0.3s ease;

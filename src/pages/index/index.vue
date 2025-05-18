@@ -1,10 +1,10 @@
 <template>
   <view class="index-page">
     <!-- 搜索栏 -->
-    <search-bar @search="handleSearch" />
+    <!-- <search-bar @search="handleSearch" /> -->
 
     <!-- Search Results -->
-    <view class="search-results" v-if="searchKeyword">
+    <!-- <view class="search-results" v-if="searchKeyword">
       <view class="results-header">
         <text class="results-title">搜索结果</text>
         <text class="results-count">共{{ filteredProducts.length }}个商品</text>
@@ -21,10 +21,10 @@
       <view class="no-results" v-if="filteredProducts.length === 0">
         <text>没有找到相关商品</text>
       </view>
-    </view>
+    </view> -->
 
     <!-- 轮播图 -->
-    <swiper class="banner-swiper" circular autoplay interval="3000" duration="500">
+    <!-- <swiper class="banner-swiper" circular autoplay interval="3000" duration="500">
       <swiper-item v-for="(item, index) in bannerList" :key="index" class="banner-item">
         <image :src="item.image" mode="aspectFill" class="banner-image" />
         <view class="banner-title" v-if="item.title">
@@ -32,7 +32,7 @@
           <text class="subtitle">{{ item.subtitle }}</text>
         </view>
       </swiper-item>
-    </swiper>
+    </swiper> -->
 
     <!-- Category Navigation -->
     <view class="category-section">
@@ -52,143 +52,86 @@
         <text class="view-more" @click="handleViewMore">查看更多</text>
       </view>
       <view class="product-list">
-        <view class="product-item" v-for="(item, index) in productList" :key="index" @click="handleProductClick(item)">
-          <image class="product-image" :src="item.image" mode="aspectFit" />
-          <view class="product-info">
-            <text class="product-name text-ellipsis-2">{{ item.name }}</text>
-            <view class="product-price">
-              <text class="member-price">¥{{ (item.price * 0.8).toFixed(2) }}</text>
-              <text class="original-price">¥{{ item.price }}</text>
-            </view>
-          </view>
+        <view class="product-item" v-for="(product, index) in productList" :key="index">
+          <ProductCard :product="product"/>
         </view>
       </view>
     </view>
   </view>
 </template>
 
-<script>
+<script lang="ts">
   import SearchBar from '@/components/search-bar/index.vue'
   import ProductCard from '@/components/product-card/index.vue'
+  import { startup } from '@/api/login'
+  import { Category, newCategory } from '@/api/category'
+  import { newProduct, Product } from '@/api/product'
+import { GlobalData } from '@/store'
 
   export default {
     components: {
       SearchBar,
       ProductCard
     },
+
+    mounted() {
+      startup()
+        .then(res => {
+          this.categoryList = res.high_light_categories
+            .slice(0, 4) // 只拿前四个
+            .map(newCategory) 
+
+          this.productList = res.recommend_products.map(newProduct)
+        })
+    },
+
     data() {
       return {
-        bannerList: [
-          {
-            image: '/static/images/banner/banner1.jpg',
-            title: '精选面料',
-            subtitle: '臻选优质面料，专业定制体验'
-          },
-          {
-            image: '/static/images/banner/banner2.jpg',
-            title: '新品上市',
-            subtitle: '2024春季新品系列'
-          },
-          {
-            image: '/static/images/banner/banner3.jpg',
-            title: '会员专享',
-            subtitle: '新人首单立减100元'
-          }
-        ],
-        categoryList: [
-          {
-            id: 1,
-            name: '西装面料',
-            icon: '/static/images/icons/suit-fabric.png',
-            categoryId: 1  // 对应套装/裤子
-          },
-          {
-            id: 2,
-            name: '衬衫面料',
-            icon: '/static/images/icons/shirt-fabric.png',
-            categoryId: 3  // 对应衬衫
-          },
-          {
-            id: 3,
-            name: '裤装面料',
-            icon: '/static/images/icons/pants-fabric.png',
-            categoryId: 1  // 对应套装/裤子
-          },
-          {
-            id: 4,
-            name: '大衣面料',
-            icon: '/static/images/icons/coat-fabric.png',
-            categoryId: 5  // 对应大衣
-          }
-        ],
-        allProducts: [
-          {
-            id: 1,
-            image: '/static/images/products/italian-wool.jpg',
-            name: '意大利进口羊毛面料 精选VBC面料',
-            memberPrice: 100,
-            price: 128
-          },
-          {
-            id: 2,
-            image: '/static/images/products/harris-tweed.jpg',
-            name: '英国进口哈里斯粗花呢面料',
-            memberPrice: 120,
-            price: 150
-          },
-          {
-            id: 3,
-            image: '/static/images/products/japanese-linen.jpg',
-            name: '日本进口棉麻混纺面料',
-            memberPrice: 80,
-            price: 98
-          },
-          {
-            id: 4,
-            image: '/static/images/products/italian-silk.jpg',
-            name: '意大利进口真丝面料',
-            memberPrice: 200,
-            price: 258
-          }
-        ],
-        productList: [],
-        searchKeyword: '',
-        showSearchResults: false,
-        searchResults: []
+        // bannerList: [
+        //   {
+        //     image: '/static/images/banner/banner1.jpg',
+        //     title: '精选面料',
+        //     subtitle: '臻选优质面料，专业定制体验'
+        //   },
+        //   {
+        //     image: '/static/images/banner/banner2.jpg',
+        //     title: '新品上市',
+        //     subtitle: '2024春季新品系列'
+        //   },
+        //   {
+        //     image: '/static/images/banner/banner3.jpg',
+        //     title: '会员专享',
+        //     subtitle: '新人首单立减100元'
+        //   }
+        // ],
+
+        categoryList: [] as Category[],
+        productList: [] as Product[],
+        // searchKeyword: '',
+        // showSearchResults: false,
+        // searchResults: []
       }
-    },
-    computed: {
-      filteredProducts() {
-        if (!this.searchKeyword) return [];
-        const keyword = this.searchKeyword.toLowerCase();
-        return this.productList.filter(item => 
-          item.name.toLowerCase().includes(keyword) ||
-          item.description.toLowerCase().includes(keyword)
-        );
-      }
-    },
-    created() {
-      // Initialize product list with all products
-      this.productList = [...this.allProducts];
     },
     methods: {
-      handleSearch(keyword) {
-        this.searchKeyword = keyword;
-        // Navigate to category page with search tag
-        uni.switchTab({
-          url: `/pages/category/category?search=${encodeURIComponent(keyword)}`,
-          success: () => {
-            console.log('Successfully navigated to category page with search tag')
-          },
-          fail: (err) => {
-            console.error('Navigation failed:', err)
-          }
-        })
-      },
-      handleCategoryClick(category) {
+      // handleSearch(keyword) {
+      //   this.searchKeyword = keyword;
+      //   // Navigate to category page with search tag
+      //   uni.switchTab({
+      //     url: `/pages/category/category?search=${encodeURIComponent(keyword)}`,
+      //     success: () => {
+      //       console.log('Successfully navigated to category page with search tag')
+      //     },
+      //     fail: (err) => {
+      //       console.error('Navigation failed:', err)
+      //     }
+      //   })
+      // },
+      handleCategoryClick(category: Category) {
         console.log('Navigating to category:', category.name, 'with ID:', category.categoryId)
+        
+        GlobalData.set_redirect_id(category.id);
         uni.switchTab({
-          url: `/pages/category/category?id=${category.categoryId}`,
+          url: `/pages/category/category`,
           success: () => {
             console.log('Successfully navigated to category page')
           },
@@ -197,7 +140,7 @@
           }
         })
       },
-      handleProductClick(product) {
+      handleProductClick(product: Product) {
         uni.navigateTo({
           url: `/pages/product/detail?id=${product.id}`
         })
@@ -208,7 +151,6 @@
         })
       },
       onPullDownRefresh() {
-        // TODO: 实现下拉刷新
         setTimeout(() => {
           uni.stopPullDownRefresh()
         }, 1000)

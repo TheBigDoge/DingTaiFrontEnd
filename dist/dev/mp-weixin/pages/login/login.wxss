@@ -1,0 +1,220 @@
+/**
+ * 这里是uni-app内置的常用样式变量
+ *
+ * uni-app 官方扩展插件及插件市场（https://ext.dcloud.net.cn）上很多三方插件均使用了这些样式变量
+ * 如果你是插件开发者，建议你使用scss预处理，并在插件代码中直接使用这些变量（无需 import 这个文件），方便用户通过搭积木的方式开发整体风格一致的App
+ *
+ */
+/**
+ * 如果你是App开发者（插件使用者），你可以通过修改这些变量来定制自己的插件主题，实现自定义主题功能
+ *
+ * 如果你的项目同样使用了scss预处理，你也可以直接在你的 scss 代码中使用如下变量，同时无需 import 这个文件
+ */
+/* ---------- 自定义主题颜色变量 ---------- */
+/* 品牌主色 */
+/* 行为相关颜色 */
+/* 文字颜色 */
+/* 背景色 */
+/* 边框颜色 */
+/* 价格颜色 */
+/* ---------- 尺寸变量 ---------- */
+/* 间距 */
+/* 水平间距 */
+/* 垂直间距 */
+/* 字体大小 */
+/* 图片尺寸 */
+/* 圆角 */
+/* 阴影 */
+/* 透明度 */
+/* 文章场景相关 */
+/* ---------- 自定义全局样式 ---------- */
+/* 全局样式 */
+page.data-v-cdfe2409 {
+  background-color: #F5F5F0;
+  font-size: 28rpx;
+  color: #333333;
+  box-sizing: border-box;
+  min-height: 100vh;
+}
+
+/* 通用样式类 */
+.container.data-v-cdfe2409 {
+  padding: 20rpx;
+}
+.flex-row.data-v-cdfe2409 {
+  display: flex;
+  flex-direction: row;
+}
+.flex-column.data-v-cdfe2409 {
+  display: flex;
+  flex-direction: column;
+}
+.flex-center.data-v-cdfe2409 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.text-ellipsis.data-v-cdfe2409 {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.text-ellipsis-2.data-v-cdfe2409 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+.safe-area-bottom.data-v-cdfe2409 {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.card.data-v-cdfe2409 {
+  background-color: #fff;
+  border-radius: 12rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+  margin-bottom: 20rpx;
+  overflow: hidden;
+}
+.price.data-v-cdfe2409 {
+  color: #FF6B35;
+  font-weight: bold;
+  font-size: 32rpx;
+}
+.member-price.data-v-cdfe2409 {
+  color: #FF6B35;
+  font-size: 28rpx;
+}
+.original-price.data-v-cdfe2409 {
+  color: #999999;
+  font-size: 24rpx;
+  text-decoration: line-through;
+  margin-left: 10rpx;
+}
+.auth-button-wrapper.data-v-cdfe2409 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+.auth-button.data-v-cdfe2409 {
+  padding: 20rpx 40rpx;
+  font-size: 32rpx;
+  border-radius: 8rpx;
+}
+.login-page.data-v-cdfe2409 {
+  min-height: 100vh;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+}
+.brand-header.data-v-cdfe2409 {
+  height: 400rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff;
+}
+.brand-header .brand-logo.data-v-cdfe2409 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.brand-header .brand-logo .logo-text.data-v-cdfe2409 {
+  font-size: 60rpx;
+  font-weight: 900;
+  color: #333;
+  letter-spacing: 10rpx;
+  margin-bottom: 16rpx;
+}
+.brand-header .brand-logo .chinese-name.data-v-cdfe2409 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.brand-header .brand-logo .chinese-name text.data-v-cdfe2409 {
+  font-size: 60rpx;
+  line-height: 1.5;
+  color: #666;
+}
+.brand-header .brand-logo .chinese-name text.data-v-cdfe2409:first-child {
+  font-weight: 300;
+}
+.login-form.data-v-cdfe2409 {
+  padding: 0 60rpx;
+}
+.login-form .form-item.data-v-cdfe2409 {
+  height: 100rpx;
+  border-bottom: 2rpx solid #EEEEEE;
+  margin-bottom: 40rpx;
+}
+.login-form .form-item input.data-v-cdfe2409 {
+  height: 100%;
+  font-size: 32rpx;
+}
+.login-form .form-item .placeholder.data-v-cdfe2409 {
+  color: #999999;
+}
+.login-form .login-btn.data-v-cdfe2409 {
+  height: 90rpx;
+  background-color: #f5f5f5;
+  color: #999999;
+  font-size: 32rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 45rpx;
+  margin-top: 60rpx;
+}
+.login-form .login-btn.active.data-v-cdfe2409 {
+  background-color: #333333;
+  color: #fff;
+}
+.other-login.data-v-cdfe2409 {
+  margin-top: 80rpx;
+}
+.other-login .divider.data-v-cdfe2409 {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 40rpx;
+}
+.other-login .divider.data-v-cdfe2409::before, .other-login .divider.data-v-cdfe2409::after {
+  content: "";
+  flex: 1;
+  height: 2rpx;
+  background-color: #EEEEEE;
+}
+.other-login .divider text.data-v-cdfe2409 {
+  color: #999999;
+  font-size: 28rpx;
+  padding: 0 20rpx;
+}
+.other-login .login-methods.data-v-cdfe2409 {
+  display: flex;
+  justify-content: center;
+}
+.other-login .login-methods .method-item.data-v-cdfe2409 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.other-login .login-methods .method-item .iconfont.data-v-cdfe2409 {
+  font-size: 64rpx;
+  margin-bottom: 16rpx;
+}
+.other-login .login-methods .method-item text.data-v-cdfe2409 {
+  font-size: 28rpx;
+  color: #333333;
+}
+.agreement.data-v-cdfe2409 {
+  margin-top: auto;
+  padding: 30rpx 0;
+  display: flex;
+  justify-content: center;
+}
+.agreement .agree-text.data-v-cdfe2409 {
+  font-size: 24rpx;
+  color: #999999;
+}

@@ -5,7 +5,7 @@
 
 		<!-- 分类筛选 -->
 		<view class="filter-tabs">
-			<view v-for="(tab, index) in filterTabs" :key="index" class="tab-item"
+			<view v-for="tab, index in filterTabs" :key="tab.type" class="tab-item"
 				:class="{ active: activeTabIndex === index }" @click="handleTabClick(index)">
 				{{ tab.name }}
 			</view>
@@ -14,7 +14,7 @@
 		<!-- 主体内容 -->
 		<view class="content">
 			<!-- 左侧分类 -->
-			<scroll-view scroll-y class="category-menu" ref="categoryMenu" :scroll-top="scrollTop">
+			<scroll-view scroll-y class="category-menu" ref="categoryMenu">
 				<view v-for="(item, index) in categoryList" :key="index" class="menu-item"
 					:class="{ active: activeCategoryIndex === index }" @click="handleCategoryClick(index)">
 					{{ item.name }}
@@ -22,22 +22,23 @@
 			</scroll-view>
 
 			<!-- 右侧商品 -->
-			<scroll-view scroll-y class="product-list" @scrolltolower="loadMore">
+			<scroll-view scroll-y class="product-list">
 				<view class="grid-container">
-					<view class="grid-item" v-for="(item, index) in productList" :key="index">
-						<product-card :product="item" @click="handleProductClick(item)" />
+					<view class="grid-item" v-for="(item, index) in productList[categoryList[activeCategoryIndex]?.id]" :key="`c${categoryList[activeCategoryIndex].id}p${item.id}i${index}`">
+						<product-card :product="item" />
 					</view>
 				</view>
-				<view class="loading" v-if="loading">加载中...</view>
-				<view class="no-more" v-if="noMore">没有更多了</view>
 			</scroll-view>
 		</view>
 	</view>
 </template>
 
-<script>
+<script lang="ts">
 	import SearchBar from '@/components/search-bar/index.vue'
 	import ProductCard from '@/components/product-card/index.vue'
+	import { CateogryAndProductList, GetProducts, newProduct, Product, ProductListSorting } from '@/api/product'
+	import { Category, newCategory } from '@/api/category'
+import { GlobalData } from '@/store'
 
 	export default {
 		components: {
@@ -47,164 +48,99 @@
 		data() {
 			return {
 				filterTabs: [
-					{ name: '综合', type: 'all' },
-					{ name: '价格', type: 'price' },
-					{ name: '销量', type: 'sales' },
-					{ name: '推荐', type: 'recommend' }
+					{ name: '综合', type: ProductListSorting.General },
+					{ name: '价格', type: ProductListSorting.Price },
+					{ name: '销量', type: ProductListSorting.Sell },
+					{ name: '推荐', type: ProductListSorting.Recommend },
 				],
 				activeTabIndex: 0,
-				categoryList: [
-					{ id: 0, name: '全部' },
-					{ id: 1, name: '套装/裤子' },
-					{ id: 2, name: '上衣' },
-					{ id: 3, name: '衬衫' },
-					{ id: 4, name: '马甲' },
-					{ id: 5, name: '大衣' },
-					{ id: 6, name: '休闲夹克/风衣' },
-					{ id: 7, name: '休闲裤' },
-					{ id: 8, name: '针织' }
-				],
+				categoryList: [] as Category[],
 				activeCategoryIndex: 0,
-				productList: [],
-				page: 1,
-				loading: false,
-				noMore: false,
+				productList: {} as {[key: number]: Product[]}, // cateogry id to products
 				keyword: '',
-				scrollTop: 0
+				fetch_done: false,
 			}
 		},
-		onLoad(options) {
-			console.log('Category page loaded with options:', options)
-			// 从url参数中获取分类id
-			if (options.id) {
-				const categoryId = parseInt(options.id)
-				console.log('Looking for category with ID:', categoryId)
-				const categoryIndex = this.categoryList.findIndex(item => item.id === categoryId)
-				console.log('Found category at index:', categoryIndex)
-				
-				if (categoryIndex !== -1) {
-					this.activeCategoryIndex = categoryIndex
-					console.log('Set active category index to:', categoryIndex)
-					
-					// 确保分类菜单滚动到选中项
-					this.$nextTick(() => {
-						this.scrollToCategory(categoryIndex)
-					})
-				}
-			}
-
+		onLoad(options: any) {
 			// 处理搜索标签
-			if (options.search) {
+			if (options?.search) {
 				this.keyword = decodeURIComponent(options.search)
-				// 设置搜索标签为活动状态
-				this.activeTabIndex = 0 // 设置为综合标签
-				// 重置分类为全部
-				this.activeCategoryIndex = 0
-				// 确保滚动到顶部
-				this.$nextTick(() => {
-					this.scrollToCategory(0)
-				})
 			}
-
-			this.loadProducts()
+		},
+		onShow() {
+			this.fetchProductList()
 		},
 		methods: {
-			scrollToCategory(index) {
-				const query = uni.createSelectorQuery().in(this)
-				query.select('.category-menu').boundingClientRect()
-				query.select(`.menu-item:nth-child(${index + 1})`).boundingClientRect()
-				query.exec((res) => {
-					if (res[0] && res[1]) {
-						const menu = res[0]
-						const menuItem = res[1]
-						// 计算滚动位置，确保选中项在可视区域中间
-						const scrollTop = menuItem.top - menu.top - (menu.height - menuItem.height) / 2
-						console.log('Scrolling to position:', scrollTop)
-						this.scrollTop = scrollTop
-					}
-				})
+			fetchProductList(force?: boolean) {
+				if (!this.fetch_done || !this.productList || force) {
+					GetProducts(this.keyword, this.filterTabs[this.activeTabIndex].type)
+						.then(response => {
+							console.log('products', response);
+							this.parseResponse(response.data);
+							this.trySwitchToStoreCategory();
+						})
+					this.fetch_done = true;
+				} else {
+					this.trySwitchToStoreCategory();
+				}
 			},
-			handleSearch(keyword) {
-				this.keyword = keyword
-				this.page = 1
-				this.productList = []
-				this.noMore = false
-				this.loadProducts()
-			},
-			handleTabClick(index) {
-				if (this.activeTabIndex === index) return
-				this.activeTabIndex = index
-				this.page = 1
-				this.productList = []
-				this.noMore = false
-				this.loadProducts()
-			},
-			handleCategoryClick(index) {
-				if (this.activeCategoryIndex === index) return
-				this.activeCategoryIndex = index
-				this.page = 1
-				this.productList = []
-				this.noMore = false
-				this.loadProducts()
-			},
-			handleProductClick(product) {
-				uni.navigateTo({
-					url: `/pages/product/detail?id=${product.id}`
-				})
-			},
-			loadMore() {
-				if (this.loading || this.noMore) return
-				this.page++
-				this.loadProducts()
-			},
-			loadProducts() {
-				if (this.loading) return
-				this.loading = true
 
-				// 模拟接口请求
-				setTimeout(() => {
-					const mockProducts = [
-						{
-							id: 1,
-							image: '/static/images/products/fabric1.jpg',
-							name: '意大利进口羊毛面料 精选VBC面料',
-							memberPrice: 100,
-							price: 128
-						},
-						{
-							id: 2,
-							image: '/static/images/products/fabric2.jpg',
-							name: '英国进口哈里斯粗花呢面料',
-							memberPrice: 120,
-							price: 150
-						},
-						{
-							id: 3,
-							image: '/static/images/products/fabric3.jpg',
-							name: '日本进口棉麻混纺面料',
-							memberPrice: 80,
-							price: 98
-						},
-						{
-							id: 4,
-							image: '/static/images/products/fabric4.jpg',
-							name: '意大利进口真丝面料',
-							memberPrice: 200,
-							price: 258
+			trySwitchToStoreCategory() {
+				const redirectId = GlobalData.get_redirect_id();
+				if (redirectId) {
+					console.log('trying to redirect to id', redirectId);
+					for (const idx in this.categoryList) {
+						console.log(this.categoryList[idx]);
+						if (this.categoryList[idx].id === redirectId) {
+							console.log('matched');
+							this.activeCategoryIndex = parseInt(idx) || 0;
+							break;
 						}
-					]
-
-					// 根据分类过滤
-					// 实际项目中这里应该是接口过滤
-
-					if (this.page >= 3) {
-						this.noMore = true
-					} else {
-						this.productList = [...this.productList, ...mockProducts]
 					}
+				}
+			},
 
-					this.loading = false
-				}, 800)
+			parseResponse(data: CateogryAndProductList[]) {
+				this.categoryList = data.map(item => {
+					return newCategory(item.category)
+				})
+
+				if (this.activeCategoryIndex < 0 || this.activeCategoryIndex >= this.categoryList.length) {
+					this.activeCategoryIndex = 0;
+				}
+
+				const newList = {} as {[key: number]: Product[]};
+
+				for (const {category, products} of data) {
+					const productList = products.map(newProduct);
+					newList[category.id] = productList;
+				}
+				console.log(newList);
+				this.productList = newList;
+			},
+			handleSearch(keyword: string) {
+				if (this.keyword !== keyword) {
+					this.keyword = keyword
+					this.fetchProductList(true)
+				}
+			},
+			handleTabClick(index: number) {
+				console.log('click index', index);
+				console.log('current', this.activeTabIndex);
+				if (this.activeTabIndex === index) {
+					return
+				}
+				
+				this.activeTabIndex = index;
+				this.fetchProductList(true);
+			},
+			handleCategoryClick(index: number) {
+				if (this.activeCategoryIndex === index) {
+					return
+				}
+
+				this.activeCategoryIndex = index;
+				this.fetchProductList(true)
 			}
 		}
 	}

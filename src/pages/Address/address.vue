@@ -13,21 +13,22 @@
 						<text class="name">{{ item.name }}</text>
 						<text class="phone">{{ item.phone }}</text>
 						<text class="default-tag" v-if="item.isDefault">默认</text>
+						<text class="tag" v-for="tag, index in item.tags" :key="index"> {{ tag }} </text>
 					</view>
 					<view class="address-detail">
-						<text>{{ item.province }}{{ item.city }}{{ item.district }}{{ item.detail }}</text>
+						<text>{{ item.province }}{{ item.city }}{{ item.district }}{{ item.address }}</text>
 					</view>
 				</view>
 				<view class="address-actions">
-					<view class="action-btn" @click="setDefault(index)">
+					<view class="action-btn address-card-default" @click="setDefault(index)">
 						<text :class="['iconfont', item.isDefault ? 'icon-check' : 'icon-circle']"></text>
-						<text>{{ item.isDefault ? '默认地址' : '设为默认' }}</text>
+						<text>{{ item.isDefault ? '本地址为默认地址' : '设为默认地址' }}</text>
 					</view>
-					<view class="action-btn" @click="editAddress(index)">
+					<view class="action-btn address-card-edit" @click="editAddress(index)">
 						<text class="iconfont icon-edit"></text>
 						<text>编辑</text>
 					</view>
-					<view class="action-btn" @click="deleteAddress(index)">
+					<view class="action-btn address-card-delete" @click="deleteAddress(index)">
 						<text class="iconfont icon-delete"></text>
 						<text>删除</text>
 					</view>
@@ -49,52 +50,65 @@
 	</view>
 </template>
 
-<script>
+<script lang="ts">
+import { Address, deleteAddress, listAddresses, newAddress, updateAddress } from '@/api/address';
+
 	export default {
 		data() {
 			return {
-				addressList: []
+				addressList: [] as Address[],
 			}
 		},
 		onShow() {
-			// 从本地存储获取地址列表
 			this.loadAddressList();
 		},
 		methods: {
 			loadAddressList() {
-				const addressList = uni.getStorageSync('addressList') || [];
-				this.addressList = addressList;
+				console.log('trying to load address list');
+				listAddresses().then(addresses => {
+					this.addressList = addresses.results.map(newAddress)
+				})
 			},
 			addAddress() {
+				console.log('trying to goto add_address')
 				uni.navigateTo({
 					url: '/pages/address/edit'
 				});
 			},
-			editAddress(index) {
+			editAddress(index: number) {
+				console.log('trying to goto edit_address', this.addressList[index])
 				uni.navigateTo({
-					url: `/pages/address/edit?index=${index}`
+					url: `/pages/address/edit?id=${this.addressList[index].id}`
 				});
 			},
-			deleteAddress(index) {
+			deleteAddress(index: number) {
+				console.log(`trying to delete address at ${index}`)
 				uni.showModal({
 					title: '提示',
 					content: '确定要删除该地址吗？',
 					success: res => {
 						if (res.confirm) {
-							this.addressList.splice(index, 1);
-							this.saveAddressList();
+							const address = this.addressList[index];
+							deleteAddress(address.id)
+								.then(() => this.loadAddressList())
 						}
 					}
 				});
 			},
-			setDefault(index) {
-				this.addressList.forEach((item, i) => {
-					item.isDefault = i === index;
-				});
-				this.saveAddressList();
-			},
-			saveAddressList() {
-				uni.setStorageSync('addressList', this.addressList);
+			setDefault(index: number) {
+				const address = this.addressList[index];
+				if (address.isDefault) {
+					return;
+				}
+
+				console.log(`trying to set default to address at index ${index}`);
+				for (const address of this.addressList) {
+					address.isDefault = false;
+				}
+				
+				address.isDefault = true;
+				updateAddress(address)
+					.then(() => this.loadAddressList())
 			}
 		}
 	}
@@ -154,6 +168,15 @@
 						border-radius: 4rpx;
 						margin-left: 20rpx;
 					}
+
+					.tag {
+						font-size: 24rpx;
+						color: #4d71ff;
+						border: 2rpx solid #4d71ff;
+						padding: 4rpx 10rpx;
+						border-radius: 4rpx;
+						margin-left: 20rpx;
+					}
 				}
 
 				.address-detail {
@@ -183,6 +206,20 @@
 					&:active {
 						opacity: 0.7;
 					}
+				}
+
+				.address-card-default {
+					width: 40%
+				}
+
+				.address-card-edit {
+					width: 30%;
+					margin: auto;
+				}
+
+				.address-card-delete {
+					width: 30%;
+					margin: auto;
 				}
 			}
 		}

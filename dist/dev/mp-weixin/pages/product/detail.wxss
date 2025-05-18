@@ -1,0 +1,315 @@
+/**
+ * 这里是uni-app内置的常用样式变量
+ *
+ * uni-app 官方扩展插件及插件市场（https://ext.dcloud.net.cn）上很多三方插件均使用了这些样式变量
+ * 如果你是插件开发者，建议你使用scss预处理，并在插件代码中直接使用这些变量（无需 import 这个文件），方便用户通过搭积木的方式开发整体风格一致的App
+ *
+ */
+/**
+ * 如果你是App开发者（插件使用者），你可以通过修改这些变量来定制自己的插件主题，实现自定义主题功能
+ *
+ * 如果你的项目同样使用了scss预处理，你也可以直接在你的 scss 代码中使用如下变量，同时无需 import 这个文件
+ */
+/* ---------- 自定义主题颜色变量 ---------- */
+/* 品牌主色 */
+/* 行为相关颜色 */
+/* 文字颜色 */
+/* 背景色 */
+/* 边框颜色 */
+/* 价格颜色 */
+/* ---------- 尺寸变量 ---------- */
+/* 间距 */
+/* 水平间距 */
+/* 垂直间距 */
+/* 字体大小 */
+/* 图片尺寸 */
+/* 圆角 */
+/* 阴影 */
+/* 透明度 */
+/* 文章场景相关 */
+/* ---------- 自定义全局样式 ---------- */
+/* 全局样式 */
+page.data-v-8216645a {
+  background-color: #F5F5F0;
+  font-size: 28rpx;
+  color: #333333;
+  box-sizing: border-box;
+  min-height: 100vh;
+}
+
+/* 通用样式类 */
+.container.data-v-8216645a {
+  padding: 20rpx;
+}
+.flex-row.data-v-8216645a {
+  display: flex;
+  flex-direction: row;
+}
+.flex-column.data-v-8216645a {
+  display: flex;
+  flex-direction: column;
+}
+.flex-center.data-v-8216645a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.text-ellipsis.data-v-8216645a {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.text-ellipsis-2.data-v-8216645a {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+.safe-area-bottom.data-v-8216645a {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.card.data-v-8216645a {
+  background-color: #fff;
+  border-radius: 12rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+  margin-bottom: 20rpx;
+  overflow: hidden;
+}
+.price.data-v-8216645a {
+  color: #FF6B35;
+  font-weight: bold;
+  font-size: 32rpx;
+}
+.member-price.data-v-8216645a {
+  color: #FF6B35;
+  font-size: 28rpx;
+}
+.original-price.data-v-8216645a {
+  color: #999999;
+  font-size: 24rpx;
+  text-decoration: line-through;
+  margin-left: 10rpx;
+}
+.product-detail.data-v-8216645a {
+  padding-bottom: 140rpx;
+}
+.tag.data-v-8216645a {
+  font-size: 24rpx;
+  color: #4d71ff;
+  border: 1rpx solid #4d71ff;
+  padding: 2rpx 10rpx 3rpx 10rpx;
+  border-radius: 4rpx;
+  margin-left: 30rpx;
+  text-align: center;
+}
+.price-label.data-v-8216645a {
+  color: #999999;
+  font-size: 24rpx;
+  margin-right: 8rpx;
+}
+.product-swiper.data-v-8216645a {
+  width: 100%;
+  height: 750rpx;
+}
+.product-swiper .slide-media.data-v-8216645a {
+  width: 100%;
+  height: 100%;
+}
+.card.data-v-8216645a {
+  margin: 20rpx;
+  padding: 30rpx;
+  background-color: #fff;
+  border-radius: 12rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+.product-info .product-name.data-v-8216645a {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333333;
+  margin-bottom: 16rpx;
+}
+.product-info .product-code.data-v-8216645a {
+  font-size: 24rpx;
+  color: #999999;
+  margin-bottom: 20rpx;
+}
+.product-info .price-row.data-v-8216645a {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.product-info .price-row .price-info .member-price.data-v-8216645a {
+  font-size: 40rpx;
+  color: #FF6B35;
+  font-weight: bold;
+  margin-right: 16rpx;
+}
+.product-info .price-row .price-info .member-price .price-unit.data-v-8216645a {
+  font-size: 24rpx;
+  font-weight: normal;
+}
+.product-info .price-row .price-info .original-price-cancel.data-v-8216645a {
+  font-size: 28rpx;
+  color: #999999;
+  text-decoration: line-through;
+}
+.product-info .price-row .price-info .original-price.data-v-8216645a {
+  font-size: 28rpx;
+  color: #999999;
+  text-decoration: none;
+}
+.product-info .price-row .sales-info.data-v-8216645a {
+  font-size: 28rpx;
+  color: #999999;
+}
+.section-title.data-v-8216645a {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333333;
+  margin-bottom: 30rpx;
+  position: relative;
+}
+.section-title.data-v-8216645a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -10rpx;
+  width: 40rpx;
+  height: 4rpx;
+  background-color: #333333;
+}
+.specs-list .spec-group.data-v-8216645a {
+  margin-bottom: 30rpx;
+}
+.specs-list .spec-group .spec-title.data-v-8216645a {
+  font-size: 28rpx;
+  color: #666666;
+  margin-bottom: 20rpx;
+}
+.specs-list .spec-group .length-input-container.data-v-8216645a {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 70rpx;
+  border: 1rpx solid #EEEEEE;
+  border-radius: 8rpx;
+  overflow: hidden;
+}
+.specs-list .spec-group .length-input-container.disabled.data-v-8216645a {
+  opacity: 0.5;
+  background-color: #f5f5f5;
+}
+.specs-list .spec-group .length-input-container .length-control.data-v-8216645a {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 70rpx;
+  height: 70rpx;
+  font-size: 32rpx;
+  background-color: #f5f5f5;
+  color: #333333;
+}
+.specs-list .spec-group .length-input-container .length-control.disabled.data-v-8216645a {
+  background-color: #e0e0e0;
+  color: #999999;
+}
+.specs-list .spec-group .length-input-container .length-input.data-v-8216645a {
+  flex: 1;
+  height: 70rpx;
+  text-align: center;
+  font-size: 28rpx;
+}
+.specs-list .spec-group .length-input-container .length-input.data-v-8216645a:disabled {
+  background-color: #f5f5f5;
+  color: #999999;
+}
+.specs-list .spec-group .length-tips.data-v-8216645a {
+  margin-top: 10rpx;
+  font-size: 24rpx;
+  color: #999999;
+}
+.specs-list .spec-group .buy-whole-container.data-v-8216645a {
+  margin-top: 20rpx;
+  display: flex;
+  justify-content: flex-end;
+}
+.specs-list .spec-group .buy-whole-container .buy-whole-btn.data-v-8216645a {
+  display: flex;
+  align-items: center;
+  padding: 10rpx 20rpx;
+  background-color: rgba(51, 51, 51, 0.1);
+  color: #333333;
+  border-radius: 30rpx;
+  font-size: 24rpx;
+  transition: all 0.3s ease;
+}
+.specs-list .spec-group .buy-whole-container .buy-whole-btn.active.data-v-8216645a {
+  background-color: #333333;
+  color: #fff;
+}
+.specs-list .spec-group .buy-whole-container .buy-whole-btn .btn-text.data-v-8216645a {
+  text-align: center;
+}
+.specs-list .total-price-section.data-v-8216645a {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 30rpx;
+  padding-top: 20rpx;
+  border-top: 1rpx dashed #EEEEEE;
+}
+.specs-list .total-price-section .total-price.data-v-8216645a {
+  font-size: 36rpx;
+  color: #FF6B35;
+  font-weight: bold;
+}
+.detail-section .section-title.data-v-8216645a {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333333;
+  margin-bottom: 20rpx;
+}
+.detail-section .detail-content .detail-image.data-v-8216645a {
+  width: 100%;
+  margin-bottom: 20rpx;
+}
+.detail-section .detail-content .detail-text.data-v-8216645a {
+  font-size: 28rpx;
+  color: #333333;
+  line-height: 1.6;
+}
+.action-bar.data-v-8216645a {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 120rpx;
+  background-color: #fff;
+  display: flex;
+  box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.05);
+}
+.action-bar .action-right.data-v-8216645a {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 0 20rpx;
+  height: 120rpx;
+}
+.action-bar .action-right .add-cart-btn.data-v-8216645a,
+.action-bar .action-right .buy-now-btn.data-v-8216645a {
+  flex: 1;
+  height: 70rpx;
+  line-height: 70rpx;
+  text-align: center;
+  border-radius: 35rpx;
+  font-size: 28rpx;
+}
+.action-bar .action-right .add-cart-btn.data-v-8216645a {
+  background-color: rgba(255, 107, 53, 0.1);
+  color: #FF6B35;
+  margin-right: 20rpx;
+}
+.action-bar .action-right .buy-now-btn.data-v-8216645a {
+  background-color: #FF6B35;
+  color: #fff;
+}

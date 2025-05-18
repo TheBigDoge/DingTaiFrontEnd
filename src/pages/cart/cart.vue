@@ -11,24 +11,41 @@
 		</view>
 
 		<view class="cart-content" v-if="cartList.length > 0">
-			<view class="cart-list">
-				<view class="cart-item" v-for="(item, index) in cartList" :key="index">
+			<scroll-view class="cart-list" scroll-y @scrolltolower="fetchCartItems">
+				<view class="cart-item" v-for="(item, index) in cartList" :key="item.id" @click="goToProductDetail(item.product_id)">
 					<view class="item-select">
 						<checkbox :checked="item.selected" :color="'#333'" @click="toggleSelect(index)" />
 					</view>
-					<image class="item-image" :src="item.image" mode="aspectFill" />
+					<image class="item-image" :src="item.product.image" mode="aspectFill" />
 					<view class="item-info">
-						<view class="item-name text-ellipsis-2">{{ item.name }}</view>
-						<view class="item-spec" v-if="item.color">颜色：{{ item.color }}</view>
+						<view class="item-name text-ellipsis-2">{{ item.product.name }}</view>
+						<view>
+							<text>购买长度: {{ item.is_partial_sale ? item.stock : item.product.available_stock }}m</text>
+							<text class="tag" v-if="!item.is_partial_sale"> 整块购买 </text>
+						</view>
 						<view class="item-bottom">
 							<view class="item-price">
-								<text class="member-price">¥{{ (item.unitPrice * 0.9).toFixed(2) }}/m</text>
-								<text class="original-price">¥{{ item.unitPrice }}/m</text>
-							</view>
-							<view class="item-count">
-								<text class="count-btn" @click="decreaseLength(index)">-</text>
-								<text class="count-num">{{ item.length }}</text>
-								<text class="count-btn" @click="increaseLength(index)">+</text>
+								<view v-if="isPremium">
+									<view>
+										<text class="price-label">会员价:</text>
+										<text class="member-price">¥{{ (item.product.memberPrice).toFixed(2) }}/m</text>
+									</view>
+									<view style="text-decoration: line-through">
+										<text class="price-label">原价:</text>
+										<text class="original-price">¥{{ item.product.price.toFixed(2) }}/m</text>
+									</view>
+								</view>
+								<view v-else>
+									<view>
+										<text class="price-label">单价:</text>
+										<text class="original-price">¥{{ item.product.price.toFixed(2) }}/m</text>
+									</view>
+									<view>
+										<text class="price-label">会员价:</text>
+										<text class="member-price">¥{{ (item.product.memberPrice).toFixed(2) }}/m</text>
+									</view>
+								</view>
+
 							</view>
 						</view>
 					</view>
@@ -37,17 +54,10 @@
 						<text class="iconfont icon-delete">×</text>
 					</view>
 				</view>
-			</view>
-
-			<view class="promotion-section">
-				<view class="promotion-item">
-					<text class="tag">满减</text>
-					<text class="promo-text">每200减30</text>
-				</view>
-			</view>
+			</scroll-view>
 
 			<!-- Bottom action bar -->
-			<view class="cart-footer safe-area-bottom">
+			<view class="cart-footer">
 				<view class="footer-left">
 					<checkbox :checked="isAllSelected" :color="'#333'" @click="toggleSelectAll" />
 					<text class="select-all">全选</text>
@@ -60,10 +70,8 @@
 						<view class="price-section">
 							<view class="total-price">
 								<text>合计：</text>
-								<text class="price">¥{{ totalPrice }}</text>
+								<text class="price">¥{{ totalPrice() }}</text>
 							</view>
-							<view class="discount-info" v-if="discount > 0">已优惠：¥{{ discount }}</view>
-							<view class="member-discount-info">会员享受9折优惠</view>
 						</view>
 						<view class="checkout-btn" @click="handleCheckout">
 							结算({{ selectedCount }}件)
@@ -81,12 +89,26 @@
 	</view>
 </template>
 
-<script>
+<script lang="ts">
+	import { CartItem, DeleteCartItem, DeleteCartItems, ListCartItems, newCartItem } from '@/api/cart'
+	import { GlobalData } from '@/store';
+	import { PricePerMeter } from '@/utils/price';
+
+	interface CartItemExtra {
+		selected: boolean,
+	}
+
+	type MyCartItem = CartItem & CartItemExtra;
+
 	export default {
 		data() {
 			return {
 				isManageMode: false,
-				cartList: []
+				cartList: [] as MyCartItem[],
+				page_size: 10,
+				page: 1,
+				loading: false,
+				has_more: true,
 			}
 		},
 		computed: {
@@ -96,115 +118,147 @@
 			selectedCount() {
 				return this.cartList.filter(item => item.selected).length
 			},
-			totalPrice() {
-				return this.cartList
-					.filter(item => item.selected)
-					.reduce((total, item) => {
-						const itemTotal = item.unitPrice * item.length * 0.8; // Apply member discount
-						return total + itemTotal;
-					}, 0).toFixed(2)
-			},
-			discount() {
-				const totalPriceNum = parseFloat(this.totalPrice);
-				if (totalPriceNum >= 200) {
-					return Math.floor(totalPriceNum / 200) * 30
-				}
-				return 0
+			isPremium() {
+				return GlobalData.is_premium();
 			}
 		},
+		onLoad() {
+			this.reset();
+			this.fetchCartItems();
+		},
 		onShow() {
-			// 从本地存储获取购物车数据
-			const cartList = uni.getStorageSync('cartList') || [];
-			this.cartList = cartList.map(item => ({
-				...item,
-				selected: false // 初始化选中状态为false
-			}));
+			console.log('on show');
+			this.reset();
+			this.fetchCartItems();
 		},
 		methods: {
-			toggleSelect(index) {
+			reset() {
+				this.isManageMode = false;
+				this.cartList = [];
+				this.loading = false;
+				this.has_more = true;
+				this.page = 1;
+			},
+			fetchCartItems() {
+				if (!this.loading && this.has_more) {
+					console.log('fetch cart items');
+					this.loading = true;
+					ListCartItems(this.page, this.page_size)
+						.then(response => {
+							console.log(response);
+							const list = [] as MyCartItem[];
+							for (const item of response.results) {
+								const cartItem = newCartItem(item);
+								list.push({
+									...cartItem,
+									selected: false,
+								});
+							}
+
+							if (list.length > 0) {
+								console.log('has list', list);
+								const newList = [
+									...this.cartList,
+									...list,
+								];
+
+								// 移除同id的元素
+								const existsIds = new Set();
+								const toSet = newList.filter(item => {
+									if (existsIds.has(item.id)) {
+										return false;
+									}
+
+									existsIds.add(item.id);
+									return true;
+								});
+								console.log('toSet', toSet);
+								this.cartList = toSet;
+								this.has_more = true;
+								this.page += 1;
+							} else {
+								console.log('no list');
+								this.has_more = false;
+							}
+
+							this.loading = false;
+						})
+				}
+			},
+
+			totalPrice(): PricePerMeter {
+				const isPremium = this.isPremium;
+
+				return this.cartList
+					.filter(item => item.selected)
+					.map(item => {
+						if (isPremium) {
+							return item.product.memberPrice * (item.is_partial_sale ? item.stock : item.product.available_stock)
+						} else {
+							return item.product.price * (item.is_partial_sale ? item.stock : item.product.available_stock)
+						}
+					})
+					.reduce((a, b) => a + b, 0)
+			},
+			toggleSelect(index: number) {
 				this.cartList[index].selected = !this.cartList[index].selected;
-				this.saveCartList();
 			},
 			toggleSelectAll() {
 				const newStatus = !this.isAllSelected;
 				this.cartList.forEach(item => item.selected = newStatus);
-				this.saveCartList();
-			},
-			decreaseLength(index) {
-				const currentItem = this.cartList[index];
-				if (currentItem.length > 0.85) {
-					currentItem.length = parseFloat((currentItem.length - 0.1).toFixed(1));
-					this.saveCartList();
-				} else {
-					uni.showModal({
-						title: '提示',
-						content: '确定要删除该商品吗？',
-						success: res => {
-							if (res.confirm) {
-								this.cartList.splice(index, 1);
-								this.saveCartList();
-							}
-						}
-					});
-				}
-			},
-			increaseLength(index) {
-				const currentItem = this.cartList[index];
-				currentItem.length = parseFloat((currentItem.length + 0.1).toFixed(1));
-				this.saveCartList();
 			},
 			handleCheckout() {
-				const selectedItems = this.cartList.filter(item => item.selected);
+				// const selectedItems = this.cartList.filter(item => item.selected);
 				
-				if (selectedItems.length === 0) {
-					uni.showToast({
-						title: '请选择要结算的商品',
-						icon: 'none'
-					});
-					return;
-				}
+				// if (selectedItems.length === 0) {
+				// 	uni.showToast({
+				// 		title: '请选择要结算的商品',
+				// 		icon: 'none'
+				// 	});
+				// 	return;
+				// }
 
-				// 构建订单数据
-				const orderData = {
-					items: selectedItems.map(item => ({
-						id: item.id,
-						name: item.name,
-						image: item.image,
-						color: item.color,
-						length: item.length,
-						unitPrice: item.unitPrice,
-						subtotal: item.length * item.unitPrice
-					})),
-					totalAmount: selectedItems.reduce((sum, item) => sum + item.length * item.unitPrice, 0),
-					discount: this.discount,
-					finalAmount: selectedItems.reduce((sum, item) => sum + item.length * item.unitPrice, 0) - this.discount
-				};
+				// // 构建订单数据
+				// const orderData = {
+				// 	items: selectedItems.map(item => ({
+				// 		id: item.id,
+				// 		name: item.name,
+				// 		image: item.image,
+				// 		color: item.color,
+				// 		length: item.length,
+				// 		unitPrice: item.unitPrice,
+				// 		subtotal: item.length * item.unitPrice
+				// 	})),
+				// 	totalAmount: selectedItems.reduce((sum, item) => sum + item.length * item.unitPrice, 0),
+				// 	discount: this.discount,
+				// 	finalAmount: selectedItems.reduce((sum, item) => sum + item.length * item.unitPrice, 0) - this.discount
+				// };
 
-				try {
-					// 保存订单数据到本地存储
-					uni.setStorageSync('currentOrder', orderData);
+				// try {
+				// 	// 保存订单数据到本地存储
+				// 	uni.setStorageSync('currentOrder', orderData);
 					
-					// 跳转到订单页面
-					uni.navigateTo({
-						url: '/pages/order/order',
-						success: () => {
-							console.log('Navigation successful');
-						},
-						fail: (err) => {
-							console.error('Navigation failed:', err);
-							uni.showToast({
-								title: '页面跳转失败',
-								icon: 'error'
-							});
-						}
-					});
-				} catch (e) {
-					console.error('处理订单失败:', e);
-					uni.showToast({
-						title: '处理订单失败，请重试',
-						icon: 'error'
-					});
-				}
+				// 	// 跳转到订单页面
+				// 	uni.navigateTo({
+				// 		url: '/pages/order/order',
+				// 		success: () => {
+				// 			console.log('Navigation successful');
+				// 		},
+				// 		fail: (err) => {
+				// 			console.error('Navigation failed:', err);
+				// 			uni.showToast({
+				// 				title: '页面跳转失败',
+				// 				icon: 'error'
+				// 			});
+				// 		}
+				// 	});
+				// } catch (e) {
+				// 	console.error('处理订单失败:', e);
+				// 	uni.showToast({
+				// 		title: '处理订单失败，请重试',
+				// 		icon: 'error'
+				// 	});
+				// }
 			},
 			goShopping() {
 				uni.switchTab({
@@ -216,7 +270,6 @@
 				// 退出管理模式时，重置所有选中状态
 				if (!this.isManageMode) {
 					this.cartList.forEach(item => item.selected = false);
-					this.saveCartList();
 				}
 			},
 			handleDeleteSelected() {
@@ -234,34 +287,49 @@
 					content: `确定要删除选中的${selectedItems.length}件商品吗？`,
 					success: res => {
 						if (res.confirm) {
-							this.cartList = this.cartList.filter(item => !item.selected);
-							this.saveCartList();
-							if (this.cartList.length === 0) {
-								this.isManageMode = false;
-							}
+							const toDeleteItems = this.cartList.filter(item => item.selected);
+							const toDeleteIds = toDeleteItems.map(item => item.id);
+
+							uni.showLoading({ title: '删除中' });
+							DeleteCartItems(toDeleteIds)
+								.then(() => uni.hideLoading())
+								.then(() => {
+									this.reset();
+									return this.fetchCartItems();
+								})
+								.then(() => uni.showToast({title: '删除成功'}))
 						}
 					}
 				});
 			},
-			handleDeleteItem(index) {
+			handleDeleteItem(index: number) {
 				uni.showModal({
 					title: '提示',
 					content: '确定要删除该商品吗？',
 					success: res => {
 						if (res.confirm) {
-							this.cartList.splice(index, 1);
-							this.saveCartList();
-							if (this.cartList.length === 0) {
-								this.isManageMode = false;
-							}
+							const item = this.cartList[index];
+
+							uni.showLoading({ title: '删除中' });
+							DeleteCartItem(item.id)
+								.then(() => uni.hideLoading())
+								.then(() => {
+									this.reset();
+									return this.fetchCartItems();
+								})
+								.then(() => uni.showToast({title: '删除成功'}))
 						}
 					}
 				});
 			},
-			saveCartList() {
-				// 保存购物车数据到本地存储
-				uni.setStorageSync('cartList', this.cartList);
-			}
+			goToProductDetail(productId: number) {
+				if (this.isManageMode) {
+					return;
+				}
+				uni.navigateTo({
+					url: `/pages/product/detail?id=${productId}`
+				});
+			},
 		}
 	}
 </script>
@@ -272,6 +340,12 @@
 		min-height: 100vh;
 		background-color: $uni-bg-color-grey;
 		padding-bottom: 200rpx;
+	}
+
+	.price-label {
+		color: $uni-text-color-light;
+		font-size: $uni-font-size-xs;
+		margin-right: 8rpx;
 	}
 
 	.page-header {
@@ -295,13 +369,26 @@
 		}
 	}
 
+	.tag {
+		font-size: 24rpx;
+		color: #4d71ff;
+		border: 1rpx solid #4d71ff;
+		padding: 0rpx 10rpx;
+		border-radius: 4rpx;
+		margin-left: 20rpx;
+		text-align: center;
+	}
+
 	.cart-content {
-		margin-bottom: 140rpx;
+		// margin-bottom: 140rpx;
+		height: calc(100vh - 100rpx); // 减去 header/footer 的高度
+		overflow: hidden;
 	}
 
 	.cart-list {
 		background-color: #fff;
 		margin-bottom: $uni-spacing-md;
+		height: 100%;
 
 		.cart-item {
 			display: flex;
@@ -360,7 +447,7 @@
 						.original-price {
 							color: $uni-text-color-light;
 							font-size: $uni-font-size-xs;
-							text-decoration: line-through;
+							text-decoration: none;
 						}
 					}
 
@@ -416,15 +503,6 @@
 		.promotion-item {
 			display: flex;
 			align-items: center;
-
-			.tag {
-				font-size: $uni-font-size-xs;
-				color: #fff;
-				background-color: $uni-price-color;
-				padding: 4rpx 10rpx;
-				border-radius: 4rpx;
-				margin-right: $uni-spacing-sm;
-			}
 
 			.promo-text {
 				font-size: $uni-font-size-sm;

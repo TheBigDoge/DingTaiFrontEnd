@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "分类",
+  "usingComponents": {
+    "search-bar": "../../components/search-bar/index",
+    "product-card": "../../components/product-card/index"
+  }
+}

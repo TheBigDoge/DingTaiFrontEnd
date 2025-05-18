@@ -56,6 +56,12 @@
 			}
 		},
 		{
+			"path": "pages/address/edit",
+			"style": {
+				"navigationBarTitleText": "收货地址"
+			}
+		},
+		{
 			"path": "pages/order/orderlist",
 			"style": {
 				"navigationBarTitleText": "我的订单"
@@ -71,13 +77,6 @@
 			"path": "pages/membership/detail",
 			"style": {
 				"navigationBarTitleText": "会员详情"
-			}
-		},
-		{
-			"path": "pages/user/login",
-			"style": {
-				"navigationBarTitleText": "登录/注册",
-				"navigationStyle": "custom"
 			}
 		}
 	],

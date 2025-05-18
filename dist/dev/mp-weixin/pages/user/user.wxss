@@ -1,0 +1,330 @@
+/**
+ * 这里是uni-app内置的常用样式变量
+ *
+ * uni-app 官方扩展插件及插件市场（https://ext.dcloud.net.cn）上很多三方插件均使用了这些样式变量
+ * 如果你是插件开发者，建议你使用scss预处理，并在插件代码中直接使用这些变量（无需 import 这个文件），方便用户通过搭积木的方式开发整体风格一致的App
+ *
+ */
+/**
+ * 如果你是App开发者（插件使用者），你可以通过修改这些变量来定制自己的插件主题，实现自定义主题功能
+ *
+ * 如果你的项目同样使用了scss预处理，你也可以直接在你的 scss 代码中使用如下变量，同时无需 import 这个文件
+ */
+/* ---------- 自定义主题颜色变量 ---------- */
+/* 品牌主色 */
+/* 行为相关颜色 */
+/* 文字颜色 */
+/* 背景色 */
+/* 边框颜色 */
+/* 价格颜色 */
+/* ---------- 尺寸变量 ---------- */
+/* 间距 */
+/* 水平间距 */
+/* 垂直间距 */
+/* 字体大小 */
+/* 图片尺寸 */
+/* 圆角 */
+/* 阴影 */
+/* 透明度 */
+/* 文章场景相关 */
+/* ---------- 自定义全局样式 ---------- */
+/* 全局样式 */
+page.data-v-99b0ba47 {
+  background-color: #F5F5F0;
+  font-size: 28rpx;
+  color: #333333;
+  box-sizing: border-box;
+  min-height: 100vh;
+}
+
+/* 通用样式类 */
+.container.data-v-99b0ba47 {
+  padding: 20rpx;
+}
+.flex-row.data-v-99b0ba47 {
+  display: flex;
+  flex-direction: row;
+}
+.flex-column.data-v-99b0ba47 {
+  display: flex;
+  flex-direction: column;
+}
+.flex-center.data-v-99b0ba47 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.text-ellipsis.data-v-99b0ba47 {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.text-ellipsis-2.data-v-99b0ba47 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+.safe-area-bottom.data-v-99b0ba47 {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.card.data-v-99b0ba47 {
+  background-color: #fff;
+  border-radius: 12rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+  margin-bottom: 20rpx;
+  overflow: hidden;
+}
+.price.data-v-99b0ba47 {
+  color: #FF6B35;
+  font-weight: bold;
+  font-size: 32rpx;
+}
+.member-price.data-v-99b0ba47 {
+  color: #FF6B35;
+  font-size: 28rpx;
+}
+.original-price.data-v-99b0ba47 {
+  color: #999999;
+  font-size: 24rpx;
+  text-decoration: line-through;
+  margin-left: 10rpx;
+}
+.user-page.data-v-99b0ba47 {
+  min-height: 100vh;
+  background-color: #F5F5F0;
+  padding-bottom: 30rpx;
+}
+.user-header.data-v-99b0ba47 {
+  position: relative;
+  height: 300rpx;
+  margin-bottom: 20rpx;
+}
+.user-header .header-bg.data-v-99b0ba47 {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 200rpx;
+  background: linear-gradient(to right, #E3C5A9, #D4B596);
+}
+.user-header .user-info.data-v-99b0ba47 {
+  position: absolute;
+  top: 80rpx;
+  left: 30rpx;
+  right: 30rpx;
+  height: 200rpx;
+  background-color: #fff;
+  border-radius: 24rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+  display: flex;
+  align-items: center;
+  padding: 0 30rpx;
+}
+.user-header .user-info .avatar-box.data-v-99b0ba47 {
+  margin-right: 30rpx;
+}
+.user-header .user-info .avatar-box .avatar.data-v-99b0ba47 {
+  width: 140rpx;
+  height: 140rpx;
+  border-radius: 50%;
+  border: 4rpx solid #fff;
+}
+.user-header .user-info .avatar-box .avatar-placeholder.data-v-99b0ba47 {
+  width: 140rpx;
+  height: 140rpx;
+  border-radius: 50%;
+  background-color: #f5f5f5;
+  border: 4rpx solid #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  color: #999999;
+}
+.user-header .user-info .info-right.data-v-99b0ba47 {
+  flex: 1;
+}
+.user-header .user-info .info-right .username.data-v-99b0ba47 {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333333;
+  margin-bottom: 10rpx;
+}
+.user-header .user-info .info-right .login-btn.data-v-99b0ba47 {
+  font-size: 32rpx;
+  color: #999999;
+}
+.user-header .user-info .info-right .member-level.data-v-99b0ba47 {
+  font-size: 28rpx;
+  color: #D4B596;
+}
+.user-header .user-info .settings.data-v-99b0ba47 {
+  width: 60rpx;
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.user-header .user-info .settings .icon-settings.data-v-99b0ba47 {
+  font-size: 36rpx;
+  color: #999999;
+}
+.card.data-v-99b0ba47 {
+  margin: 0 30rpx 30rpx;
+  background-color: #fff;
+  border-radius: 12rpx;
+  padding: 30rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+.section-header.data-v-99b0ba47 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30rpx;
+}
+.section-header .title.data-v-99b0ba47 {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333333;
+}
+.section-header .more.data-v-99b0ba47 {
+  font-size: 28rpx;
+  color: #999999;
+}
+.member-info .member-card.data-v-99b0ba47 {
+  height: 160rpx;
+  background: linear-gradient(to right, #E3C5A9, #D4B596);
+  border-radius: 12rpx;
+  padding: 20rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.member-info .member-card .brand-logo.data-v-99b0ba47 {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #fff;
+}
+.member-info .member-card .member-statistics.data-v-99b0ba47 {
+  display: flex;
+}
+.member-info .member-card .member-statistics .stat-item.data-v-99b0ba47 {
+  margin-right: 60rpx;
+}
+.member-info .member-card .member-statistics .stat-item .num.data-v-99b0ba47 {
+  font-size: 36rpx;
+  color: #fff;
+  font-weight: bold;
+  margin-right: 10rpx;
+}
+.member-info .member-card .member-statistics .stat-item .label.data-v-99b0ba47 {
+  font-size: 28rpx;
+  color: rgba(255, 255, 255, 0.8);
+}
+.order-types.data-v-99b0ba47 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 30rpx;
+  padding: 10rpx 0;
+}
+.order-types .type-item.data-v-99b0ba47 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20rpx;
+  background: #f8f8f8;
+  border-radius: 12rpx;
+  transition: all 0.3s ease;
+}
+.order-types .type-item.data-v-99b0ba47:active {
+  transform: scale(0.98);
+  background: #f0f0f0;
+}
+.order-types .type-item .iconfont.data-v-99b0ba47 {
+  font-size: 50rpx;
+  margin-bottom: 16rpx;
+}
+.order-types .type-item .label.data-v-99b0ba47 {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 500;
+}
+.service-list.data-v-99b0ba47 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 30rpx;
+  padding: 10rpx 0;
+}
+.service-list .service-item.data-v-99b0ba47 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20rpx;
+  background: #f8f8f8;
+  border-radius: 12rpx;
+  transition: all 0.3s ease;
+}
+.service-list .service-item.data-v-99b0ba47:active {
+  transform: scale(0.98);
+  background: #f0f0f0;
+}
+.service-list .service-item .iconfont.data-v-99b0ba47 {
+  font-size: 50rpx;
+  margin-bottom: 16rpx;
+}
+.service-list .service-item .label.data-v-99b0ba47 {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 500;
+}
+.membership-card.data-v-99b0ba47 {
+  background: #fff;
+  margin: 20rpx;
+  padding: 30rpx;
+  border-radius: 12rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+}
+.membership-card .membership-header.data-v-99b0ba47 {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+.membership-card .membership-header .membership-icon.data-v-99b0ba47 {
+  width: 80rpx;
+  height: 80rpx;
+  margin-right: 20rpx;
+}
+.membership-card .membership-header .membership-info.data-v-99b0ba47 {
+  flex: 1;
+}
+.membership-card .membership-header .membership-info .membership-title.data-v-99b0ba47 {
+  font-size: 32rpx;
+  font-weight: bold;
+  margin-bottom: 10rpx;
+  display: block;
+}
+.membership-card .membership-header .membership-info .membership-desc.data-v-99b0ba47 {
+  font-size: 24rpx;
+  color: #666;
+}
+.membership-card .membership-header .arrow-icon.data-v-99b0ba47 {
+  font-size: 32rpx;
+  color: #999;
+}
+.membership-card .membership-points.data-v-99b0ba47 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 20rpx;
+  border-top: 2rpx solid #f5f5f5;
+}
+.membership-card .membership-points .points-label.data-v-99b0ba47 {
+  font-size: 28rpx;
+  color: #666;
+}
+.membership-card .membership-points .points-value.data-v-99b0ba47 {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #ff4d4f;
+}

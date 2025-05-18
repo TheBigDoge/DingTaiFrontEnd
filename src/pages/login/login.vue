@@ -11,34 +11,18 @@
 			</view>
 		</view>
 
-		<!-- 登录表单 -->
-		<view class="login-form">
-			<view class="form-item">
-				<input type="text" v-model="form.phone" placeholder="输入手机号/邮箱" placeholder-class="placeholder" />
-			</view>
-			<view class="form-item">
-				<input :type="showPassword ? 'text' : 'password'" v-model="form.password" placeholder="输入密码"
-					placeholder-class="placeholder" />
-			</view>
-
-			<!-- 登录按钮 -->
-			<view class="login-btn" :class="{ active: form.phone && form.password }" @click="handleLogin">
-				登录/注册
-			</view>
-
-			<!-- 其他登录方式 -->
-			<view class="other-login">
-				<view class="divider">
-					<text>其他登录方式</text>
-				</view>
-				<view class="login-methods">
-					<view class="method-item">
-						<text class="iconfont icon-wechat">🔄</text>
-						<text>短信验证码登录</text>
-					</view>
-				</view>
-			</view>
+		<!-- 登录按钮 -->
+		<view class="auth-button-wrapper">
+			<button
+				class="auth-button"
+				type="button"
+				open-type="getPhoneNumber"
+				@getphonenumber="handleLogin"
+			>
+				授权登录/注册
+			</button>
 		</view>
+
 
 		<!-- 底部协议 -->
 		<view class="agreement">
@@ -47,7 +31,9 @@
 	</view>
 </template>
 
-<script>
+<script lang="ts">
+import { handleAfterLogin, WechatRegister, WechatRegisterRequest } from '@/api/login';
+
 	export default {
 		data() {
 			return {
@@ -59,40 +45,54 @@
 			}
 		},
 		methods: {
-			handleLogin() {
-				if (!this.form.phone || !this.form.password) {
-					uni.showToast({
-						title: '请输入手机号和密码',
-						icon: 'none'
-					})
-					return
-				}
-
-				// 模拟登录
-				uni.showLoading({
-					title: '登录中...'
-				})
-
-				setTimeout(() => {
-					uni.hideLoading()
-					uni.showToast({
-						title: '登录成功',
-						icon: 'success'
-					})
-
-					// 跳转回用户中心
-					setTimeout(() => {
-						uni.switchTab({
-							url: '/pages/user/index'
+			handleLogin(e: any) {
+				console.log('授权信息', e);
+				if (e) {
+					uni.login()
+						.then(loginRes => {
+							return this.customLogin(e, loginRes)
 						})
-					}, 1500)
-				}, 1500)
+						.then(() => uni.navigateBack())
+				}
+			},
+
+			async customLogin(e: any, loginRes: UniApp.LoginRes) {
+				if (import.meta.env.UNI_PLATFORM === 'mp-weixin') {
+					if (e.detail?.errMsg === 'getPhoneNumber:ok') {
+						const payload: WechatRegisterRequest = {
+							code: loginRes.code,
+							encrypted_data: e.detail?.encryptedData,
+							iv: e.detail?.iv,
+						};
+
+						console.log('微信注册payload', payload);
+
+						const response = await WechatRegister(payload);
+						console.log('微信注册结果', response);
+						handleAfterLogin(response);
+					}
+				} else {
+					uni.showToast({title: '未知平台'});
+				}
 			}
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
+	.auth-button-wrapper {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		height: 100vh;
+	}
+
+	.auth-button {
+		padding: 20rpx 40rpx;
+		font-size: 32rpx;
+		border-radius: 8rpx;
+	}
+
 	.login-page {
 		min-height: 100vh;
 		background-color: #fff;
@@ -106,6 +106,7 @@
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
+		background-color: #fff;
 
 		.brand-logo {
 			display: flex;
@@ -113,10 +114,11 @@
 			align-items: center;
 
 			.logo-text {
-				font-size: 48rpx;
-				font-weight: bold;
-				letter-spacing: 6rpx;
-				margin-bottom: 20rpx;
+				font-size: 60rpx;
+				font-weight: 900;
+				color: #333;
+				letter-spacing: 10rpx;
+				margin-bottom: 16rpx;
 			}
 
 			.chinese-name {
@@ -125,8 +127,13 @@
 				align-items: center;
 
 				text {
-					font-size: 32rpx;
-					line-height: 1.4;
+					font-size: 60rpx;
+					line-height: 1.5;
+					color: #666;
+				}
+
+				text:first-child {
+					font-weight: 300;
 				}
 			}
 		}

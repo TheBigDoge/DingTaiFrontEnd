@@ -4,13 +4,12 @@
 			<view class="header-bg"></view>
 			<view class="user-info">
 				<view class="avatar-box">
-					<image v-if="userInfo.avatar" class="avatar" :src="userInfo.avatar" mode="aspectFill"></image>
+					<image v-if="user?.avatar" class="avatar" :src="user.avatar" mode="aspectFill"></image>
 					<view class="avatar-placeholder" v-else @click="toLogin">登录</view>
 				</view>
 				<view class="info-right">
-					<view class="username" v-if="userInfo.nickname">{{ userInfo.nickname }}</view>
+					<view class="username" v-if="user">{{ user.nickname }}</view>
 					<view class="login-btn" v-else @click="toLogin">点击登录</view>
-					<view class="member-level" v-if="userInfo.nickname">会员等级：{{ userInfo.memberLevel }}</view>
 				</view>
 				<view class="settings" @click="toSettings">
 					<text class="iconfont icon-settings">⚙️</text>
@@ -18,25 +17,19 @@
 			</view>
 		</view>
 
-		<view class="member-section card">
-			<view class="section-header">
-				<text class="title">会员专区</text>
-				<text class="more" @click="toMemberCenter">查看更多</text>
-			</view>
-			<view class="member-info">
-				<view class="member-card">
-					<view class="brand-logo">鼎泰</view>
-					<view class="member-statistics">
-						<view class="stat-item">
-							<text class="num">{{ userInfo.points || 0 }}</text>
-							<text class="label">积分</text>
-						</view>
-						<view class="stat-item">
-							<text class="num">{{ userInfo.coupons || 0 }}</text>
-							<text class="label">优惠券</text>
-						</view>
-					</view>
+		<!-- 会员信息卡片 -->
+		<view class="membership-card" @click="handleViewMembership">
+			<view class="membership-header">
+				<image class="membership-icon" :src="isPremium ? `/static/images/member-active.png` : '/static/images/member-inactive.png'" mode="aspectFit" />
+				<view class="membership-info">
+					<text class="membership-title">
+						{{ membershipTitle() }}
+					</text>
+					<text class="membership-desc">
+						{{ membershipDesc() }}
+					</text>
 				</view>
+				<text class="arrow-icon">></text>
 			</view>
 		</view>
 
@@ -73,69 +66,55 @@
 			</view>
 		</view>
 
-		<!-- 用户信息卡片 -->
-		<view class="user-card">
-			<!-- ... existing user card content ... -->
-		</view>
-
-		<!-- 会员信息卡片 -->
-		<view class="membership-card" @click="handleViewMembership">
-			<view class="membership-header">
-				<image class="membership-icon" :src="isMember ? '/static/images/member-active.png' : '/static/images/member-inactive.png'" mode="aspectFit" />
-				<view class="membership-info">
-					<text class="membership-title">{{ isMember ? '尊享会员' : '普通用户' }}</text>
-					<text class="membership-desc">{{ isMember ? `会员有效期至：${expireDate}` : '开通会员，享受专属优惠' }}</text>
-				</view>
-				<text class="arrow-icon">></text>
-			</view>
-			<view class="membership-points" v-if="isMember">
-				<text class="points-label">当前积分</text>
-				<text class="points-value">{{ userPoints }}</text>
-			</view>
-		</view>
-
-		<!-- 其他功能卡片 -->
-		<view class="function-card">
-			<!-- ... existing function card content ... -->
-		</view>
 	</view>
 </template>
 
-<script>
+<script lang="ts">
+	import { GlobalData } from '@/store';
+	import { displayDate } from '@/utils/datetime';
+
 	export default {
 		data() {
 			return {
-				userInfo: {
-					nickname: '张先生',
-					avatar: '/static/images/avatar.png',
-					memberLevel: '黄金会员',
-					points: 1258,
-					coupons: 3
-				},
-				isLogin: true, // 模拟已登录状态
-				isMember: false,
-				userPoints: 0,
-				expireDate: ''
+				user: GlobalData.get_user(),
+				premium_status: GlobalData.get_premium_status(),
 			}
 		},
-		onLoad() {
-			// 检查登录状态
-			this.checkLoginStatus()
-			this.checkMembershipStatus()
-			this.getUserPoints()
-		},
-		methods: {
-			checkLoginStatus() {
-				// 实际项目中，这里应该从缓存或接口获取登录状态
-				this.isLogin = true
 
-				if (!this.isLogin) {
-					this.userInfo = {}
+		computed: {
+			isPremium() {
+				return GlobalData.is_premium();
+			}
+		},
+
+		methods: {
+			membershipTitle(): string {
+				if (this.isPremium) {
+					return "尊享VIP"
+				} else {
+					return "普通用户"
 				}
 			},
+
+			membershipDesc(): string {
+				if (this.isPremium) {
+					if (this.premium_status?.end_date)	{
+						return `会员到期日: ${displayDate(this.premium_status.end_date)}`
+					} else {
+						return `欢迎您，尊敬的永久会员` // ?
+					}
+				} else {
+					if (this.premium_status?.end_date) {
+						return `您的会员已于 ${displayDate(this.premium_status?.end_date)} 到期`
+					} else {
+						return `开通会员，享受专属优惠`
+					}
+				}
+			},
+
 			toLogin() {
 				uni.navigateTo({
-					url: '/pages/login/index'
+					url: '/pages/login/login'
 				})
 			},
 			toSettings() {
@@ -148,7 +127,7 @@
 					url: '/pages/member/index'
 				})
 			},
-			toOrderList(type) {
+			toOrderList(type: string) {
 				uni.navigateTo({
 					url: `/pages/order/orderlist?type=${type}`
 				})
@@ -164,18 +143,6 @@
 					title: '正在连接客服...',
 					icon: 'none'
 				})
-			},
-			checkMembershipStatus() {
-				const membershipStatus = uni.getStorageSync('membershipStatus');
-				this.isMember = membershipStatus && membershipStatus.expiresAt > new Date().getTime();
-				if (this.isMember) {
-					const expireDate = new Date(membershipStatus.expiresAt);
-					this.expireDate = `${expireDate.getFullYear()}-${String(expireDate.getMonth() + 1).padStart(2, '0')}-${String(expireDate.getDate()).padStart(2, '0')}`;
-				}
-			},
-			getUserPoints() {
-				const userInfo = uni.getStorageSync('userInfo') || {};
-				this.userPoints = userInfo.points || 0;
 			},
 			handleViewMembership() {
 				uni.navigateTo({
